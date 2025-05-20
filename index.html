@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-fitLife - Fitness Tracker</title>
+    <link rel="icon" href="icons/x-fit.ico">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6c40c0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="X-fitLife">
+    <link rel="apple-touch-icon" href="icons/x-fit.png">
+    <link rel="manifest" href="manifest.json">
+    <!-- End PWA Meta Tags -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .pro-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcc00 0%, #ff9900 100%);
+            color: #000;
+            font-weight: bold;
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            animation: pulse-gold 2s infinite;
+        }
+        
+        @keyframes pulse-gold {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(255, 204, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 0, 0);
+            }
+        }
+        
+        [data-theme="dark"] .pro-badge {
+            color: #000;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Loading Skeleton -->
+        <div id="loading-skeleton" class="loading-skeleton">
+            <div class="skeleton-header">
+                <div class="skeleton-left">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-line"></div>
+                </div>
+                <div class="skeleton-right">
+                    <div class="skeleton-circle"></div>
+                    <div class="skeleton-circle"></div>
+                </div>
+            </div>
+            <div class="skeleton-content">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+            <div class="skeleton-nav">
+                <div class="skeleton-nav-item"></div>
+                <div class="skeleton-nav-item"></div>
+                <div class="skeleton-nav-item"></div>
+                <div class="skeleton-nav-item"></div>
+                <div class="skeleton-nav-item"></div>
+            </div>
+        </div>
+        
+        <header>
+            <div class="header-left">
+                <div class="app-icon" id="appMenuIcon" style="display: none;">
+                    <i class="fas fa-th"></i>
+                </div>
+                <h1>X-fit</h1>
+            </div>
+            <div class="header-right">
+                <button id="themeToggleBtn" class="theme-toggle-btn" title="Switch Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-profile" id="userProfileIcon">
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="content">
+            <h2>Welcome to X-fitLife</h2>
+            
+            <div class="card-container">
+                <div class="card" onclick="window.location.href='bmr.html'">
+                    <div class="card-left">
+                        <div class="card-tag">Body BMR</div>
+                        <h3>Find Out Your BMR Instantly</h3>
+                        <div class="bmr-preview" id="bmrPreview" style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);"></div>
+                    </div>
+                    <div class="card-right">
+                        <svg class="card-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M2.75458 14.716L3.27222 16.6479C3.87647 18.9029 4.17859 20.0305 4.86351 20.7618C5.40432 21.3392 6.10421 21.7433 6.87466 21.9229C7.85044 22.1504 8.97798 21.8483 11.2331 21.244C13.4881 20.6398 14.6157 20.3377 15.347 19.6528C15.4077 19.5959 15.4664 19.5373 15.5233 19.477C15.1891 19.449 14.852 19.3952 14.5094 19.3271C13.8133 19.1887 12.9862 18.967 12.008 18.7049L11.9012 18.6763L11.8764 18.6697C10.8121 18.3845 9.92281 18.1457 9.21277 17.8892C8.46607 17.6195 7.7876 17.287 7.21148 16.7474C6.41753 16.0038 5.86193 15.0414 5.61491 13.982C5.43567 13.2133 5.48691 12.4594 5.62666 11.6779C5.76058 10.929 6.00109 10.0315 6.28926 8.95613L6.28926 8.95611L6.82365 6.96174L6.84245 6.8916C4.9219 7.40896 3.91101 7.71505 3.23687 8.34646C2.65945 8.88726 2.25537 9.58715 2.07573 10.3576C1.84821 11.3334 2.15033 12.4609 2.75458 14.716Z" fill="#8880FE"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M20.8293 10.7154L20.3116 12.6473C19.7074 14.9024 19.4052 16.0299 18.7203 16.7612C18.1795 17.3386 17.4796 17.7427 16.7092 17.9223C16.6129 17.9448 16.5152 17.9621 16.415 17.9744C15.4999 18.0873 14.3834 17.7881 12.3508 17.2435C10.0957 16.6392 8.96815 16.3371 8.23687 15.6522C7.65945 15.1114 7.25537 14.4115 7.07573 13.641C6.84821 12.6652 7.15033 11.5377 7.75458 9.28263L8.27222 7.35077C8.3591 7.02654 8.43979 6.7254 8.51621 6.44561C8.97128 4.77957 9.27709 3.86298 9.86351 3.23687C10.4043 2.65945 11.1042 2.25537 11.8747 2.07573C12.8504 1.84821 13.978 2.15033 16.2331 2.75458C18.4881 3.35883 19.6157 3.66095 20.347 4.34587C20.9244 4.88668 21.3285 5.58657 21.5081 6.35703C21.7356 7.3328 21.4335 8.46034 20.8293 10.7154ZM11.0524 9.80589C11.1596 9.40579 11.5709 9.16835 11.971 9.27556L16.8006 10.5697C17.2007 10.6769 17.4381 11.0881 17.3309 11.4882C17.2237 11.8883 16.8125 12.1257 16.4124 12.0185L11.5827 10.7244C11.1826 10.6172 10.9452 10.206 11.0524 9.80589ZM10.2756 12.7033C10.3828 12.3032 10.794 12.0658 11.1941 12.173L14.0919 12.9495C14.492 13.0567 14.7294 13.4679 14.6222 13.868C14.515 14.2681 14.1038 14.5056 13.7037 14.3984L10.8059 13.6219C10.4058 13.5147 10.1683 13.1034 10.2756 12.7033Z" fill="#3a2f6a"></path> </g></svg>
+                    </div>
+                    <div class="card-profile">
+                        <div class="profile-circle" style="background-color: var(--primary-color);">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <div class="profile-circle" style="background-color: #f8c9a7;">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="bmr.html" style="position: absolute; inset: 0; z-index: 5;"></a>
+                </div>
+                
+                <div class="card" onclick="window.location.href='bmi.html'">
+                    <div class="card-left">
+                        <div class="card-tag">Body BMI</div>
+                        <h3>Find Out Your Healthy BMI Range</h3>
+                        <div class="bmi-preview" id="bmiPreview" style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);"></div>
+                    </div>
+                    <div class="card-right">
+                        <svg class="card-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fill-rule="evenodd"> <circle cx="49" cy="16" r="13" fill="#E43535"></circle> <circle cx="49" cy="25" r="2" fill="#FFF"></circle> <path stroke="#FFF" stroke-linecap="round" stroke-width="4" d="M50.3819417,18.65833 C53.1433654,18.65833 55.3819417,16.4197538 55.3819417,13.65833 C55.3819417,10.8969063 53.1433654,8.65833004 50.3819417,8.65833004 C47.6205179,8.65833004 45.3819417,10.8969063 45.3819417,13.65833 L42.6180583,13.65833" transform="matrix(0 -1 -1 0 62.658 62.658)"></path> <g transform="matrix(-1 0 0 1 46 7)"> <path fill="#80D25B" d="M23.4866036,48.0097065 C31.1650958,48.0097065 38.5800473,40.5183261 38.5800473,32.8398339 C38.5800473,25.1613417 26.148885,4.16107354 26.148885,4.16107354 C26.148885,4.16107354 11.1666278,23.5669596 10.2595821,31.8158361 C9.35253646,40.0647126 15.8081114,48.0097065 23.4866036,48.0097065 Z" transform="rotate(36 24.377 26.085)"></path> <path stroke="#22BA8E" stroke-linecap="round" stroke-width="3" d="M32.7630713,16.2432328 C32.7630713,16.2432328 18.185904,25.1905182 12.8848872,41.669352 C11.5209508,45.9093085 9.46860808,48.9344412 7.17240395,51.0891989"></path> <polyline stroke="#22BA8E" stroke-linecap="round" stroke-width="2" points="24.948 37.035 15.205 36.622 10.489 28.312"></polyline> <polyline stroke="#22BA8E" stroke-linecap="round" stroke-width="2" points="27.941 28.341 21.296 26.982 19.162 21.564"></polyline> </g> </g> </g></svg>
+                    </div>
+                    <div class="card-profile">
+                        <div class="profile-circle" style="background-color: var(--primary-color);">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <div class="profile-circle" style="background-color: #f8c9a7;">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="bmi.html" style="position: absolute; inset: 0; z-index: 5;"></a>
+                </div>
+                
+                <div class="card" onclick="window.location.href='VO2.html'">
+                    <div class="card-left">
+                        <div class="card-tag">VO2 Max</div>
+                        <h3>Your Cardio Fitness Level</h3>
+                        <div class="vo2-preview" id="vo2Preview" style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);"></div>
+                        <div class="pro-badge">PRO</div>
+                    </div>
+                    <div class="card-right">
+                        <svg class="card-svg" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M512 512m-480 0a480 480 0 1 0 960 0 480 480 0 1 0-960 0Z" fill="#E9E8FF"></path><path d="M723.2 704c-25.6 0-51.2-12.8-70.4-32L582.4 582.4H435.2l-38.4 64c-19.2 32-51.2 57.6-89.6 57.6-57.6 0-102.4-44.8-102.4-102.4v-12.8V576l25.6-166.4c6.4-70.4 57.6-121.6 128-121.6 32 0 70.4 12.8 89.6 38.4 25.6 0 89.6-6.4 128 0 25.6-25.6 57.6-32 89.6-32 51.2 0 96 32 115.2 83.2v12.8l38.4 179.2c0 6.4 6.4 19.2 6.4 32 0 51.2-44.8 102.4-102.4 102.4z" fill="#8880FE"></path><path d="M716.8 460.8c-12.8 0-19.2-12.8-19.2-19.2s6.4-19.2 19.2-19.2c12.8 0 19.2 12.8 19.2 19.2s-6.4 19.2-19.2 19.2z m-108.8 0c-12.8 0-19.2-12.8-19.2-19.2s6.4-19.2 19.2-19.2c12.8 0 19.2 12.8 19.2 19.2s-6.4 19.2-19.2 19.2z m51.2 57.6c-6.4 0-19.2-6.4-19.2-19.2s6.4-19.2 19.2-19.2 19.2 12.8 19.2 19.2-6.4 19.2-19.2 19.2z m0-115.2c-6.4 0-19.2-6.4-19.2-19.2s6.4-19.2 19.2-19.2 19.2 12.8 19.2 19.2-6.4 19.2-19.2 19.2zM345.6 416h-51.2V448h51.2v51.2h32V448h51.2v-32h-51.2v-51.2h-32z" fill="#FFFFFF"></path></g></svg>
+                    </div>
+                    <div class="card-profile">
+                        <div class="profile-circle" style="background-color: var(--primary-color);">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <div class="profile-circle" style="background-color: #f8c9a7;">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" onclick="window.location.href='tips.html'">
+                    <div class="card-left">
+                        <div class="card-tag">Tips</div>
+                        <h3>Get fitness tips from our X-fit AI</h3>
+                        <div class="tips-preview" id="tipsPreview" style="margin-top: 10px; font-size: 0.9rem; color: var(--secondary-text);"></div>
+                    </div>
+                    <div class="card-right">
+                       <svg class="card-svg" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M566 268.4v66.3H353.9v-66.3h-66.3v-79.5h357.9v79.5H566z" fill="#FFFFFF"></path><path d="M558.5 319.2l98.7 86.4c72.6 50.6 115.8 133.5 115.8 222 0 88-63.7 163-150.5 177.4-55 9.1-110.1 13.6-165.1 13.6s-110.1-4.5-165.1-13.6c-86.8-14.3-150.5-89.4-150.5-177.4 0-88.5 43.3-171.3 115.8-221.9l113.7-86.4h187.2z" fill="#FFFFFF"></path><path d="M457.4 845.1c-56.2 0-113.2-4.7-169.4-14C188 814.6 115.3 729 115.3 627.6c0-97.1 47.5-188.2 127.2-243.7l119.9-91.2h206l105.1 92c78.9 55.6 126 146.2 126 242.8 0 101.4-72.6 187-172.7 203.5-56.1 9.4-113.1 14.1-169.4 14.1z m-77.2-499.4l-106.5 81c-66.3 46.2-105.4 121.1-105.4 200.8 0 75.3 54 138.9 128.3 151.2 106.7 17.6 214.9 17.6 321.6 0 74.3-12.3 128.3-75.9 128.3-151.2 0-79.7-39.1-154.6-104.5-200.2l-2.3-1.8-91.2-79.8H380.2z" fill="#333333"></path><path d="M354 305l-66.7-57.3c-13.8-8.9-21-22.7-20.7-36.7m395.1 0.1c0 14.7-8.3 28.4-22.1 36.5L561.9 308" fill="#FFFFFF"></path><path d="M561.9 334.5c-7.9 0-15.7-3.5-21-10.3-9-11.6-6.9-28.2 4.7-37.2l80.5-62.2c5.7-3.3 9-8.5 9-13.7 0-14.6 11.9-26.5 26.5-26.5s26.5 11.9 26.5 26.5c0 23.6-12.5 45.3-33.6 58.4l-76.6 59.4c-4.6 3.8-10.3 5.6-16 5.6z m-208-3c-6.1 0-12.3-2.1-17.3-6.4l-65.4-56.3c-20-13.6-31.6-35.3-31.2-58.4 0.3-14.6 12.8-26.4 27-26 14.6 0.3 26.3 12.4 26 27-0.1 5.3 3 10.4 8.5 13.9l2.9 2.2 66.7 57.3c11.1 9.5 12.4 26.3 2.8 37.4-5.1 6.2-12.5 9.3-20 9.3z" fill="#333333"></path><path d="M365.4 229.3c-14.6 0-26.5-11.9-26.5-26.5 0-6.6-9.8-13.9-22.9-13.9s-22.9 7.4-22.9 13.9c0 14.6-11.9 26.5-26.5 26.5s-26.5-11.9-26.5-26.5c0-36.9 34-67 75.9-67s75.9 30 75.9 67c0 14.7-11.9 26.5-26.5 26.5zM562.9 229.3c-14.6 0-26.5-11.9-26.5-26.5 0-6.6-9.8-13.9-22.9-13.9-13.1 0-22.9 7.4-22.9 13.9 0 14.6-11.9 26.5-26.5 26.5s-26.5-11.9-26.5-26.5c0-36.9 34.1-67 75.9-67s75.9 30 75.9 67c0.1 14.7-11.8 26.5-26.5 26.5z" fill="#333333"></path><path d="M661.7 229.3c-14.6 0-26.5-11.9-26.5-26.5 0-6.6-9.8-13.9-22.9-13.9s-22.9 7.4-22.9 13.9c0 14.6-11.9 26.5-26.5 26.5s-26.5-11.8-26.5-26.5c0-36.9 34-67 75.9-67s75.9 30 75.9 67c0 14.7-11.8 26.5-26.5 26.5zM464.2 229.3c-14.6 0-26.5-11.9-26.5-26.5 0-6.6-9.8-13.9-22.9-13.9s-22.9 7.4-22.9 13.9c0 14.6-11.9 26.5-26.5 26.5s-26.5-11.9-26.5-26.5c0-36.9 34-67 75.9-67s75.9 30 75.9 67c0 14.7-11.9 26.5-26.5 26.5z" fill="#333333"></path><path d="M679.1 621.5m-205.1 0a205.1 205.1 0 1 0 410.2 0 205.1 205.1 0 1 0-410.2 0Z" fill="#FFDB5B"></path><path d="M679.1 853.1c-127.7 0-231.6-103.9-231.6-231.6 0-127.7 103.9-231.6 231.6-231.6s231.6 103.9 231.6 231.6c0 127.7-103.9 231.6-231.6 231.6z m0-410.2C580.6 442.9 500.4 523 500.4 621.5S580.5 800.1 679 800.1 857.7 720 857.7 621.5s-80.2-178.6-178.6-178.6z" fill="#333333"></path><path d="M720.47 621.453l-41.436 41.436-41.437-41.436 41.436-41.437z" fill="#FFFFFF"></path><path d="M679.079 737.919l-116.46-116.46 116.46-116.461 116.46 116.46-116.46 116.46z m-41.508-116.46l41.437 41.436 41.436-41.437-41.436-41.436-41.437 41.436z" fill="#333333"></path><path d="M591.6 302.3l76-20.4c14.1-3.8 28.7 4.6 32.5 18.7 3.8 14.1-4.6 28.7-18.7 32.5l-76 20.4c-14.1 3.8-28.7-4.6-32.5-18.7-3.8-14.2 4.6-28.7 18.7-32.5z" fill="#333333"></path></g></svg>
+                    </div>
+                    <div class="card-profile">
+                        <div class="profile-circle" style="background-color: var(--primary-color);">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <div class="profile-circle" style="background-color: #f8c9a7;">
+                            <i class="fas fa-user"></i>
+                            <div class="profile-circle check">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="completion-message">
+                    <div class="check-circle">
+                        <img src="icons/x-fit.svg" alt="X-fit Logo">
+                    </div>
+                    <h3>Present by Xexis</h3>
+                    <p>Your Life, Your Power. Your Fitness, Your Future.</p>
+                </div>
+                
+                <div class="cta-button" onclick="window.location.href='explore.html'">
+                    Explore the Library
+                </div>
+            </div>
+        </main>
+        
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <a href="explore.html" class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>Explore</span>
+            </a>
+            <a href="ask.html" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Ask</span>
+            </a>
+            <a href="notes.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Notes</span>
+            </a>
+            <div class="nav-item" onclick="window.location.href='settings.html'">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+        
+        <!-- App Menu Popup -->
+        <div class="app-menu-overlay" id="appMenuOverlay">
+            <div class="app-menu-popup">
+                <div class="swipe-indicator"></div>
+                <div class="app-menu-header">
+                    <h3>Our Apps</h3>
+                    <button class="close-button" id="closeAppMenu">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="app-grid">
+                    <a href="#" class="app-item">
+                        <div class="app-icon-large" style="background-color: #FF6B6B;">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <span class="app-name">HeartRate</span>
+                    </a>
+                    
+                    <a href="#" class="app-item">
+                        <div class="app-icon-large" style="background-color: #48dbfb;">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <span class="app-name">RunTracker</span>
+                    </a>
+                    
+                    <a href="#" class="app-item">
+                        <div class="app-icon-large" style="background-color: #1dd1a1;">
+                            <i class="fas fa-apple-alt"></i>
+                        </div>
+                        <span class="app-name">NutriPlan</span>
+                    </a>
+                    
+                    <a href="#" class="app-item">
+                        <div class="app-icon-large" style="background-color: #feca57;">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <span class="app-name">SleepWell</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        // Loading skeleton functionality
+        window.addEventListener('load', function() {
+            const loadingSkeleton = document.getElementById('loading-skeleton');
+            
+            // Hide skeleton when page is fully loaded
+            setTimeout(function() {
+                if (loadingSkeleton) {
+                    loadingSkeleton.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingSkeleton.style.display = 'none';
+                    }, 300);
+                }
+            }, 800); // Add a small delay to ensure smooth transition
+        });
+        
+        // Show skeleton if page takes too long to load
+        setTimeout(function() {
+            const loadingSkeleton = document.getElementById('loading-skeleton');
+            if (loadingSkeleton && window.document.readyState !== 'complete') {
+                loadingSkeleton.classList.add('connection-issue');
+                
+                // Add connection issue message
+                if (!document.querySelector('.connection-message')) {
+                    const message = document.createElement('div');
+                    message.className = 'connection-message';
+                    message.innerHTML = `
+                        <i class="fas fa-wifi"></i>
+                        <p>Slow connection detected. Please wait...</p>
+                    `;
+                    loadingSkeleton.appendChild(message);
+                }
+            }
+        }, 5000); // Show message after 5 seconds of loading
+        
+        // Theme toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const themeIcon = themeToggleBtn.querySelector('i');
+            
+            // Check current theme and update icon accordingly
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun'; // Switch to sun icon in dark mode
+            } else {
+                themeIcon.className = 'fas fa-moon'; // Moon icon for light mode
+            }
+            
+            // Add click event listener to toggle theme
+            themeToggleBtn.addEventListener('click', function() {
+                if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                    // Switch to light mode
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    // Switch to dark mode
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                }
+            });
+            
+            const bmrPreview = document.getElementById('bmrPreview');
+            const vo2Preview = document.getElementById('vo2Preview');
+            const tipsPreview = document.getElementById('tipsPreview');
+            const userData = JSON.parse(localStorage.getItem('xfitUser'));
+            
+            // Gemini API configuration
+            const API_KEY = "AIzaSyDFdYDjLbyC73TdejXW6oUWQoAJUVvxPPE";
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+            
+            // Display a fitness tip in the tips preview
+            if (tipsPreview) {
+                // Get current date as string for localStorage key
+                const today = new Date().toISOString().split('T')[0];
+                const storageKey = `fitness_tip_${today}`;
+                
+                // Clear old tips (keep only last 7 days)
+                clearOldTips();
+                
+                // Check if we already have a tip for today
+                const savedTip = localStorage.getItem(storageKey);
+                
+                if (savedTip) {
+                    // Use the saved tip if available
+                    displayTip(savedTip);
+                } else {
+                    // Show loading indicator
+                    tipsPreview.innerHTML = '<strong>Today\'s Tip</strong>: <span class="loading-dots">Loading</span>';
+                    addLoadingAnimation();
+                    
+                    // Get a new tip from Gemini API
+                    getFitnessTipFromAPI()
+                        .then(tip => {
+                            // Save the tip for today
+                            localStorage.setItem(storageKey, tip);
+                            displayTip(tip);
+                        })
+                        .catch(error => {
+                            console.error("Error fetching fitness tip:", error);
+                            // Fallback to a default tip if API fails
+                            const fallbackTips = [
+                            "Stay hydrated - Drink water before, during & after workouts",
+                "Focus on compound exercises for maximum benefits",
+                "Mix cardio and strength training for optimal results",
+                "Rest is essential - Allow 48hrs recovery for muscle groups",
+                "Proper form is more important than lifting heavy weights",
+                "Track your progress to stay motivated & see results",
+                "Warm up properly to prevent injury & improve performance",
+                "Eat protein within 30 mins after exercise for recovery",
+                "Consistency beats intensity - Regular workouts win",
+                "Vary your routine to prevent plateaus & keep motivated",
+                "Sleep 7-9 hours for optimal recovery & performance",
+                "Include mobility work to improve flexibility & prevent injury"
+                            ];
+                            const fallbackTip = fallbackTips[Math.floor(Math.random() * fallbackTips.length)];
+                            displayTip(fallbackTip);
+                        });
+                }
+                
+                // Function to display the tip in the preview
+                function displayTip(tip) {
+                    tipsPreview.innerHTML = `<strong>Today's Tip</strong>: "${tip}"`;
+                    
+                    // Change the heading text
+                    const tipsCard = document.querySelector('.card[onclick="window.location.href=\'tips.html\'"]');
+                    if (tipsCard) {
+                        const heading = tipsCard.querySelector('h3');
+                        if (heading) {
+                            heading.textContent = "Daily Fitness Tip";
+                        }
+                    }
+                    
+                    // Update check icons
+                    updateTipsCheckIcons(tipsCard);
+                }
+                
+                // Function to clear old tips from localStorage
+                function clearOldTips() {
+                    try {
+                        // Get all keys from localStorage
+                        for (let i = 0; i < localStorage.length; i++) {
+                            const key = localStorage.key(i);
+                            
+                            // Check if it's a fitness tip key
+                            if (key && key.startsWith('fitness_tip_')) {
+                                const tipDate = key.replace('fitness_tip_', '');
+                                const tipDateTime = new Date(tipDate).getTime();
+                                const currentTime = new Date().getTime();
+                                
+                                // Calculate difference in days
+                                const daysDiff = Math.floor((currentTime - tipDateTime) / (1000 * 60 * 60 * 24));
+                                
+                                // Remove tips older than 7 days
+                                if (daysDiff > 7) {
+                                    localStorage.removeItem(key);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Error clearing old tips:", error);
+                        // Non-critical error, continue with the app
+                    }
+                }
+                
+                // Function to add loading animation to tips preview
+                function addLoadingAnimation() {
+                    const loadingEl = tipsPreview.querySelector('.loading-dots');
+                    if (!loadingEl) return;
+                    
+                    let dots = 0;
+                    const loadingInterval = setInterval(() => {
+                        dots = (dots + 1) % 4;
+                        loadingEl.textContent = 'Loading' + '.'.repeat(dots);
+                        
+                        // Clear interval if loading text no longer exists
+                        if (!tipsPreview.querySelector('.loading-dots')) {
+                            clearInterval(loadingInterval);
+                        }
+                    }, 300);
+                    
+                    // Safety cleanup after 10 seconds
+                    setTimeout(() => {
+                        clearInterval(loadingInterval);
+                    }, 10000);
+                }
+                
+                // Function to get a fitness tip from Gemini API
+                async function getFitnessTipFromAPI() {
+                    const prompt = {
+                        contents: [{
+                            parts: [{
+                                text: "Generate a short, concise fitness tip that is practical and motivational. Keep it under 80 characters. Don't use hashtags or emojis. Don't include quotes."
+                            }]
+                        }]
+                    };
+                    
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(prompt)
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`API request failed with status ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // Check if we have valid data
+                        if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+                            throw new Error("Unexpected API response format");
+                        }
+                        
+                        let tip = data.candidates[0].content.parts[0].text.trim();
+                        
+                        // Clean up the tip (remove quotes if present)
+                        tip = tip.replace(/^["']|["']$/g, '');
+                        
+                        // Ensure the tip isn't too long
+                        if (tip.length > 80) {
+                            tip = tip.substring(0, 77) + "...";
+                        }
+                        
+                        return tip;
+                    } catch (error) {
+                        console.error("Error calling Gemini API:", error);
+                        throw error;
+                    }
+                }
+            }
+            
+            if (bmrPreview && userData && userData.bmrHistory && userData.bmrHistory.length > 0) {
+                // Get the latest BMR entry
+                const latestBMR = userData.bmrHistory[userData.bmrHistory.length - 1];
+                const formattedBMR = Math.round(latestBMR.bmr).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                
+                // Calculate date difference
+                const entryDate = new Date(latestBMR.date);
+                const now = new Date();
+                const diffTime = Math.abs(now - entryDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                let timeAgo;
+                if (diffDays === 0) {
+                    timeAgo = "Today";
+                } else if (diffDays === 1) {
+                    timeAgo = "Yesterday";
+                } else {
+                    timeAgo = diffDays + " days ago";
+                }
+                
+                // Display the BMR in the preview with strong tags
+                bmrPreview.innerHTML = `<strong>Your BMR</strong>: ${formattedBMR} calories/day (${timeAgo})`;
+                
+                // Change the heading text when BMR results are available
+                const bmrCard = document.querySelector('.card[onclick="window.location.href=\'bmr.html\'"]');
+                if (bmrCard) {
+                    const heading = bmrCard.querySelector('h3');
+                    if (heading) {
+                        heading.textContent = "Your Metabolic Rate";
+                    }
+                }
+                
+                // Update check icons based on BMR quality
+                updateBMRCheckIcons(latestBMR.bmr, userData.gender || 'male');
+            }
+            
+            // VO2 max preview code (new)
+            if (vo2Preview && userData && userData.vo2MaxHistory && userData.vo2MaxHistory.length > 0) {
+                // Get the latest VO2 max entry
+                const latestVO2 = userData.vo2MaxHistory[userData.vo2MaxHistory.length - 1];
+                const formattedVO2 = latestVO2.vo2max.toString();
+                
+                // Calculate date difference
+                const entryDate = new Date(latestVO2.date);
+                const now = new Date();
+                const diffTime = Math.abs(now - entryDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                let timeAgo;
+                if (diffDays === 0) {
+                    timeAgo = "Today";
+                } else if (diffDays === 1) {
+                    timeAgo = "Yesterday";
+                } else {
+                    timeAgo = diffDays + " days ago";
+                }
+                
+                // Get fitness level based on VO2 max value
+                const fitnessLevel = getVO2FitnessLevel(latestVO2.vo2max, userData.age || 30, latestVO2.gender || 'male');
+                
+                // Define color mapping based on fitness level
+                const levelColors = {
+                    'Poor': '#ff6b6b',      // Red
+                    'Fair': '#feca57',      // Orange/Yellow
+                    'Good': '#1dd1a1',      // Green
+                    'Excellent': '#54a0ff', // Blue
+                    'Superior': '#8880FE'   // Purple (match app color)
+                };
+                
+                // Get method name to display
+                let methodName = '';
+                switch(latestVO2.method) {
+                    case 'resting':
+                        methodName = 'Resting HR Method';
+                        break;
+                    case 'walk':
+                        methodName = 'Rockport Walk Test';
+                        break;
+                    case 'run':
+                        methodName = '1.5-Mile Run Test';
+                        break;
+                    default:
+                        methodName = 'VO2 Max Test';
+                }
+                
+                // Display the VO2 max in the preview with strong tags and colored fitness level
+                vo2Preview.innerHTML = `
+                    <strong>${formattedVO2} ml/kg/min</strong> - 
+                    <span style="color: ${levelColors[fitnessLevel]}; font-weight: bold;">${fitnessLevel}</span>
+                    <br>via ${methodName} (${timeAgo})
+                `;
+                
+                // Change the heading text when VO2 max results are available
+                const vo2Card = document.querySelector('.card[onclick="window.location.href=\'VO2.html\'"]');
+                if (vo2Card) {
+                    const heading = vo2Card.querySelector('h3');
+                    if (heading) {
+                        heading.textContent = "Your Cardio Fitness";
+                    }
+                }
+                
+                // Update check icons based on VO2 max quality
+                updateVO2CheckIcons(latestVO2.vo2max, userData.age || 30, latestVO2.gender || 'male');
+            }
+        });
+        
+        // Function to update check icons for tips card
+        function updateTipsCheckIcons(tipsCard) {
+            if (!tipsCard) {
+                tipsCard = document.querySelector('.card[onclick="window.location.href=\'tips.html\'"]');
+                if (!tipsCard) return;
+            }
+            
+            const cardProfile = tipsCard.querySelector('.card-profile');
+            if (!cardProfile) return;
+            
+            const profileCircles = cardProfile.querySelectorAll('.profile-circle');
+            if (profileCircles.length < 2) return;
+            
+            // Get the check divs inside each profile circle
+            const firstCheckIcon = profileCircles[0].querySelector('.profile-circle.check i');
+            const secondCheckIcon = profileCircles[1].querySelector('.profile-circle.check i');
+            
+            if (!firstCheckIcon || !secondCheckIcon) return;
+            
+            // Set check icons to indicate daily tips available
+            firstCheckIcon.className = 'fas fa-check';
+            firstCheckIcon.parentElement.style.display = 'flex';
+            firstCheckIcon.parentElement.style.backgroundColor = '#1dd1a1'; // Green
+            
+            secondCheckIcon.className = 'fas fa-lightbulb';
+            secondCheckIcon.parentElement.style.display = 'flex';
+            secondCheckIcon.parentElement.style.backgroundColor = '#feca57'; // Yellow
+            
+            // Make sure text color is white for better visibility
+            firstCheckIcon.style.color = 'white';
+            secondCheckIcon.style.color = 'white';
+        }
+        
+        // Function to get fitness level from VO2 max value
+        function getVO2FitnessLevel(vo2max, age, gender) {
+            if (gender === 'male') {
+                if (age < 30) {
+                    if (vo2max < 42) return 'Poor';
+                    else if (vo2max < 45) return 'Fair';
+                    else if (vo2max < 50) return 'Good';
+                    else if (vo2max < 55) return 'Excellent';
+                    else return 'Superior';
+                } 
+                else if (age < 40) {
+                    if (vo2max < 41) return 'Poor';
+                    else if (vo2max < 43) return 'Fair';
+                    else if (vo2max < 47) return 'Good';
+                    else if (vo2max < 53) return 'Excellent';
+                    else return 'Superior';
+                }
+                else if (age < 50) {
+                    if (vo2max < 38) return 'Poor';
+                    else if (vo2max < 41) return 'Fair';
+                    else if (vo2max < 45) return 'Good';
+                    else if (vo2max < 52) return 'Excellent';
+                    else return 'Superior';
+                }
+                else if (age < 60) {
+                    if (vo2max < 35) return 'Poor';
+                    else if (vo2max < 38) return 'Fair';
+                    else if (vo2max < 42) return 'Good';
+                    else if (vo2max < 49) return 'Excellent';
+                    else return 'Superior';
+                }
+                else {
+                    if (vo2max < 31) return 'Poor';
+                    else if (vo2max < 35) return 'Fair';
+                    else if (vo2max < 38) return 'Good';
+                    else if (vo2max < 45) return 'Excellent';
+                    else return 'Superior';
+                }
+            } 
+            else { // female
+                if (age < 30) {
+                    if (vo2max < 36) return 'Poor';
+                    else if (vo2max < 40) return 'Fair';
+                    else if (vo2max < 43) return 'Good';
+                    else if (vo2max < 49) return 'Excellent';
+                    else return 'Superior';
+                } 
+                else if (age < 40) {
+                    if (vo2max < 34) return 'Poor';
+                    else if (vo2max < 37) return 'Fair';
+                    else if (vo2max < 40) return 'Good';
+                    else if (vo2max < 45) return 'Excellent';
+                    else return 'Superior';
+                }
+                else if (age < 50) {
+                    if (vo2max < 32) return 'Poor';
+                    else if (vo2max < 35) return 'Fair';
+                    else if (vo2max < 38) return 'Good';
+                    else if (vo2max < 44) return 'Excellent';
+                    else return 'Superior';
+                }
+                else if (age < 60) {
+                    if (vo2max < 25) return 'Poor';
+                    else if (vo2max < 29) return 'Fair';
+                    else if (vo2max < 30) return 'Good';
+                    else if (vo2max < 34) return 'Excellent';
+                    else return 'Superior';
+                }
+                else {
+                    if (vo2max < 26) return 'Poor';
+                    else if (vo2max < 29) return 'Fair';
+                    else if (vo2max < 31) return 'Good';
+                    else if (vo2max < 35) return 'Excellent';
+                    else return 'Superior';
+                }
+            }
+        }
+        
+        // Function to update check icons based on VO2 max quality
+        function updateVO2CheckIcons(vo2max, age, gender) {
+            const vo2Card = document.querySelector('.card[onclick="window.location.href=\'VO2.html\'"]');
+            if (!vo2Card) return;
+            
+            const cardProfile = vo2Card.querySelector('.card-profile');
+            if (!cardProfile) return;
+            
+            const profileCircles = cardProfile.querySelectorAll('.profile-circle');
+            if (profileCircles.length < 2) return;
+            
+            // Get the check divs inside each profile circle
+            const firstCheckIcon = profileCircles[0].querySelector('.profile-circle.check i');
+            const secondCheckIcon = profileCircles[1].querySelector('.profile-circle.check i');
+            
+            if (!firstCheckIcon || !secondCheckIcon) return;
+            
+            // Get the fitness level
+            const fitnessLevel = getVO2FitnessLevel(vo2max, age, gender);
+            
+            // Set style for first circle (primary indicator - overall fitness)
+            firstCheckIcon.parentElement.style.display = 'flex';
+            
+            // Set style for second circle (secondary indicator - improvement needed)
+            secondCheckIcon.parentElement.style.display = 'flex';
+            
+            // Define color mapping based on fitness level
+            const levelColors = {
+                'Poor': '#ff6b6b',      // Red
+                'Fair': '#feca57',      // Orange/Yellow
+                'Good': '#1dd1a1',      // Green
+                'Excellent': '#54a0ff', // Blue
+                'Superior': '#8880FE'   // Purple (match app color)
+            };
+            
+            // Update based on fitness level
+            switch (fitnessLevel) {
+                case 'Superior':
+                    // First icon: check with app's primary color
+                    firstCheckIcon.className = 'fas fa-check';
+                    firstCheckIcon.parentElement.style.backgroundColor = levelColors['Superior'];
+                    // Second icon: star to indicate exceptional performance
+                    secondCheckIcon.className = 'fas fa-star';
+                    secondCheckIcon.parentElement.style.backgroundColor = '#FFA500'; // Gold
+                    break;
+                    
+                case 'Excellent':
+                    // First icon: check with blue color
+                    firstCheckIcon.className = 'fas fa-check';
+                    firstCheckIcon.parentElement.style.backgroundColor = levelColors['Excellent'];
+                    // Second icon: check
+                    secondCheckIcon.className = 'fas fa-check';
+                    secondCheckIcon.parentElement.style.backgroundColor = levelColors['Good'];
+                    break;
+                    
+                case 'Good':
+                    // First icon: check with green color
+                    firstCheckIcon.className = 'fas fa-check';
+                    firstCheckIcon.parentElement.style.backgroundColor = levelColors['Good'];
+                    // Second icon: check
+                    secondCheckIcon.className = 'fas fa-check';
+                    secondCheckIcon.parentElement.style.backgroundColor = ''; // Default color
+                    break;
+                    
+                case 'Fair':
+                    // First icon: exclamation mark with yellow color
+                    firstCheckIcon.className = 'fas fa-exclamation';
+                    firstCheckIcon.parentElement.style.backgroundColor = levelColors['Fair'];
+                    // Second icon: arrow up to indicate need for improvement
+                    secondCheckIcon.className = 'fas fa-arrow-up';
+                    secondCheckIcon.parentElement.style.backgroundColor = '#bce5df'; // Default color
+                    break;
+                    
+                case 'Poor':
+                    // First icon: times with red color
+                    firstCheckIcon.className = 'fas fa-times';
+                    firstCheckIcon.parentElement.style.backgroundColor = levelColors['Poor'];
+                    // Second icon: exclamation triangle to indicate warning
+                    secondCheckIcon.className = 'fas fa-exclamation-triangle';
+                    secondCheckIcon.parentElement.style.backgroundColor = levelColors['Fair'];
+                    break;
+                    
+                default:
+                    // Reset to defaults if something goes wrong
+                    firstCheckIcon.className = 'fas fa-question';
+                    secondCheckIcon.className = 'fas fa-question';
+                    break;
+            }
+            
+            // Make sure text color is white for better visibility
+            firstCheckIcon.style.color = 'white';
+            secondCheckIcon.style.color = 'white';
+            
+            // Set tooltips to explain icons
+            setVO2TooltipMessages(profileCircles, fitnessLevel);
+        }
+        
+        // Function to set tooltip messages for VO2 max indicators
+        function setVO2TooltipMessages(profileCircles, fitnessLevel) {
+            if (profileCircles.length < 2) return;
+            
+            const firstCircle = profileCircles[0];
+            const secondCircle = profileCircles[1];
+            
+            // Default messages
+            let firstMessage = "Fitness level: ";
+            let secondMessage = "";
+            
+            // Set custom messages based on fitness level
+            switch (fitnessLevel) {
+                case 'Superior':
+                    firstMessage += "Superior - Excellent cardiovascular fitness";
+                    secondMessage = "Outstanding! You're in the top percentile";
+                    break;
+                    
+                case 'Excellent':
+                    firstMessage += "Excellent - Very good cardiovascular fitness";
+                    secondMessage = "Great work! Keep maintaining this level";
+                    break;
+                    
+                case 'Good':
+                    firstMessage += "Good - Healthy cardiovascular system";
+                    secondMessage = "Well done! Room for improvement";
+                    break;
+                    
+                case 'Fair':
+                    firstMessage += "Fair - Below average cardiovascular fitness";
+                    secondMessage = "Increase your cardio activity for better results";
+                    break;
+                    
+                case 'Poor':
+                    firstMessage += "Poor - Low cardiovascular fitness";
+                    secondMessage = "Warning: Improvement needed for heart health";
+                    break;
+                    
+                default:
+                    firstMessage += "Unknown";
+                    secondMessage = "Retest recommended";
+                    break;
+            }
+            
+            // Set the title attribute for tooltips
+            firstCircle.setAttribute('title', firstMessage);
+            secondCircle.setAttribute('title', secondMessage);
+        }
+        
+        // Function to update check icons based on BMR quality
+        function updateBMRCheckIcons(bmr, gender) {
+            const bmrCard = document.querySelector('.card[onclick="window.location.href=\'bmr.html\'"]');
+            if (!bmrCard) return;
+            
+            // Fix the selector to target the immediate child elements of card-profile
+            const cardProfile = bmrCard.querySelector('.card-profile');
+            if (!cardProfile) return;
+            
+            const profileCircles = cardProfile.querySelectorAll('.profile-circle');
+            if (profileCircles.length < 2) return;
+            
+            // Get the check divs inside each profile circle
+            const firstCheckIcon = profileCircles[0].querySelector('.profile-circle.check i');
+            const secondCheckIcon = profileCircles[1].querySelector('.profile-circle.check i');
+            
+            if (!firstCheckIcon || !secondCheckIcon) return;
+            
+            let isBMRGood = false;
+            
+            // Evaluate if BMR is in a good range based on gender
+            // These are approximate values - adjust as needed
+            if (gender === 'male') {
+                isBMRGood = bmr >= 1500 && bmr <= 2000;
+            } else {
+                isBMRGood = bmr >= 1200 && bmr <= 1800;
+            }
+            
+            // Update first icon
+            if (isBMRGood) {
+                firstCheckIcon.className = 'fas fa-check';
+                // Make check visible by styling its parent
+                firstCheckIcon.parentElement.style.display = 'flex';
+            } else {
+                firstCheckIcon.className = 'fas fa-times';
+                firstCheckIcon.parentElement.style.display = 'flex';
+            }
+            
+            // Update second icon for very low BMR
+            const isVeryLowBMR = (gender === 'male' && bmr < 1200) || (gender === 'female' && bmr < 1000);
+            
+            if (isVeryLowBMR) {
+                secondCheckIcon.className = 'fas fa-times';
+                secondCheckIcon.parentElement.style.display = 'flex';
+            } else {
+                secondCheckIcon.className = 'fas fa-check';
+                secondCheckIcon.parentElement.style.display = 'flex';
+            }
+        }
+    </script>
+    
+    <!-- Add swipe to close functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add swipe to close functionality to app-menu-popup
+            const appMenuPopup = document.querySelector('.app-menu-popup');
+            const appMenuOverlay = document.getElementById('appMenuOverlay');
+            const appMenuIcon = document.getElementById('appMenuIcon');
+            
+            // Create swipe tip element
+            const swipeTip = document.createElement('div');
+            swipeTip.className = 'swipe-tip';
+            swipeTip.textContent = 'Swipe down to close';
+            document.body.appendChild(swipeTip);
+            
+            // Show swipe tip when popup opens
+            if (appMenuIcon && appMenuOverlay) {
+                appMenuIcon.addEventListener('click', function() {
+                    // Show swipe tip with slight delay to ensure popup is visible first
+                    setTimeout(() => {
+                        swipeTip.classList.add('visible');
+                        // Auto-hide swipe tip after animation completes
+                        setTimeout(() => {
+                            swipeTip.classList.remove('visible');
+                        }, 3000);
+                    }, 300);
+                });
+            }
+            
+            if (appMenuPopup && appMenuOverlay) {
+                let touchStartY = 0;
+                let touchStartX = 0;
+                let touchEndY = 0;
+                let touchEndX = 0;
+                
+                // Set minimum distance required for swipe
+                const minSwipeDistance = 80;
+                
+                // Add touch event listeners to the popup
+                appMenuPopup.addEventListener('touchstart', function(e) {
+                    touchStartY = e.changedTouches[0].screenY;
+                    touchStartX = e.changedTouches[0].screenX;
+                }, false);
+                
+                appMenuPopup.addEventListener('touchend', function(e) {
+                    touchEndY = e.changedTouches[0].screenY;
+                    touchEndX = e.changedTouches[0].screenX;
+                    
+                    // Calculate swipe distance
+                    const swipeDistanceY = touchEndY - touchStartY;
+                    const swipeDistanceX = touchEndX - touchStartX;
+                    
+                    // Close on swipe down or swipe right
+                    if (swipeDistanceY > minSwipeDistance || swipeDistanceX > minSwipeDistance) {
+                        appMenuOverlay.classList.remove('visible');
+                    }
+                }, false);
+                
+                // Optional: Add visual feedback while swiping
+                appMenuPopup.addEventListener('touchmove', function(e) {
+                    const currentY = e.changedTouches[0].screenY;
+                    const currentX = e.changedTouches[0].screenX;
+                    
+                    const moveDistanceY = currentY - touchStartY;
+                    const moveDistanceX = currentX - touchStartX;
+                    
+                    // Add some resistance to the swipe
+                    if (moveDistanceY > 0 || moveDistanceX > 0) {
+                        // Apply transform only for small movements to show feedback
+                        const translateY = Math.min(moveDistanceY * 0.2, 30);
+                        const translateX = Math.min(moveDistanceX * 0.2, 30);
+                        
+                        // Apply transform to give visual feedback
+                        appMenuPopup.style.transform = `translate(${translateX}px, ${translateY}px)`;
+                        appMenuPopup.style.opacity = 1 - (Math.max(translateY, translateX) / 100);
+                    }
+                }, false);
+                
+                // Reset transform when touch ends
+                appMenuPopup.addEventListener('touchend', function() {
+                    appMenuPopup.style.transform = 'translate(0, 0)';
+                    appMenuPopup.style.opacity = 1;
+                }, false);
+                
+                // Reset transform when touch is canceled
+                appMenuPopup.addEventListener('touchcancel', function() {
+                    appMenuPopup.style.transform = 'translate(0, 0)';
+                    appMenuPopup.style.opacity = 1;
+                }, false);
+            }
+            
+            // Add swipe to close functionality to profile popup (dynamically created)
+            function addSwipeToProfilePopup() {
+                // This function will be called whenever the profile popup is created
+                const profilePopup = document.querySelector('.profile-popup');
+                const popupContent = profilePopup ? profilePopup.querySelector('.popup-content') : null;
+                
+                if (profilePopup && popupContent) {
+                    // Add swipe indicator to popup content if it doesn't already have one
+                    if (!popupContent.querySelector('.swipe-indicator')) {
+                        const indicator = document.createElement('div');
+                        indicator.className = 'swipe-indicator';
+                        popupContent.insertBefore(indicator, popupContent.firstChild);
+                    }
+                    
+                    // Show swipe tip
+                    swipeTip.classList.add('visible');
+                    setTimeout(() => {
+                        swipeTip.classList.remove('visible');
+                    }, 3000);
+                    
+                    let touchStartY = 0;
+                    let touchEndY = 0;
+                    const minSwipeDistance = 80;
+                    
+                    // Add touch event listeners to the popup content
+                    popupContent.addEventListener('touchstart', function(e) {
+                        touchStartY = e.changedTouches[0].screenY;
+                    }, false);
+                    
+                    popupContent.addEventListener('touchend', function(e) {
+                        touchEndY = e.changedTouches[0].screenY;
+                        const swipeDistance = touchEndY - touchStartY;
+                        
+                        // Close on swipe down
+                        if (swipeDistance > minSwipeDistance) {
+                            // Use existing close function if available
+                            if (typeof closeProfilePopup === 'function') {
+                                closeProfilePopup();
+                            } else {
+                                profilePopup.style.display = 'none';
+                            }
+                        }
+                    }, false);
+                    
+                    // Visual feedback while swiping
+                    popupContent.addEventListener('touchmove', function(e) {
+                        const currentY = e.changedTouches[0].screenY;
+                        const moveDistance = currentY - touchStartY;
+                        
+                        if (moveDistance > 0) {
+                            const translateY = Math.min(moveDistance * 0.3, 50);
+                            popupContent.style.transform = `translateY(${translateY}px)`;
+                            popupContent.style.opacity = 1 - (translateY / 150);
+                        }
+                    }, false);
+                    
+                    // Reset transform when touch ends or cancels
+                    popupContent.addEventListener('touchend', function() {
+                        popupContent.style.transform = 'translateY(0)';
+                        popupContent.style.opacity = 1;
+                    }, false);
+                    
+                    popupContent.addEventListener('touchcancel', function() {
+                        popupContent.style.transform = 'translateY(0)';
+                        popupContent.style.opacity = 1;
+                    }, false);
+                }
+            }
+            
+            // Observe for profile popup creation
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                        for (let i = 0; i < mutation.addedNodes.length; i++) {
+                            const node = mutation.addedNodes[i];
+                            if (node.classList && node.classList.contains('profile-popup')) {
+                                addSwipeToProfilePopup();
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Start observing the document body for changes
+            observer.observe(document.body, { childList: true });
+            
+            // Track if user has seen the tip before to reduce repeated notifications
+            let hasSeenSwipeTip = localStorage.getItem('hasSeenSwipeTip') === 'true';
+            if (!hasSeenSwipeTip) {
+                // Set a flag after showing the tip so we don't show it too often
+                appMenuIcon.addEventListener('click', function() {
+                    localStorage.setItem('hasSeenSwipeTip', 'true');
+                }, { once: true });
+            }
+        });
+    </script>
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 

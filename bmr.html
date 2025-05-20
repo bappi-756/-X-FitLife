@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMR Calculator - XfitLife</title>
+    <link rel="icon" href="icons/x-fit.ico">
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#6c40c0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="X-fitLife">
+        <link rel="apple-touch-icon" href="icons/x-fit.png">
+        <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .bmr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+        }
+        
+        .BMR-CON {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            background-color: var(--background-color);
+            margin-bottom: 70px; /* Space for bottom nav */
+        }
+        
+        .bmr-card {
+            background-color: var(--card-background);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .bmr-form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .bmr-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .bmr-form-group input, .bmr-form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+        
+        .bmr-form-group input:focus, .bmr-form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .bmr-gender-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        
+        .bmr-gender-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .bmr-gender-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(108, 64, 192, 0.1);
+        }
+        
+        .bmr-gender-option i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .calculate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 600;
+            margin: 1rem 0;
+            box-shadow: 0 2px 8px rgba(108, 64, 192, 0.3);
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #5a35a0;
+        }
+        
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .bmr-result {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .bmr-result-content {
+            background-color: var(--card-background);
+            padding: 2rem;
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            min-width: 100vw;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: popIn 0.5s ease;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .close-result {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--background-color);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .bmr-result.visible {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .bmr-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calories-section {
+            background-color: var(--background-color);
+            border-radius: 15px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        .calories-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .calories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+        
+        .calorie-box {
+            padding: 0.8rem;
+            border-radius: 10px;
+            background-color: var(--card-background);
+            text-align: center;
+        }
+        
+        .calorie-box-title {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            margin-bottom: 0.3rem;
+        }
+        
+        .calorie-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .bmr-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        
+        .bmr-formula {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            margin-top: 1rem;
+            text-align: left;
+            padding: 0.8rem;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .activity-level-container {
+            margin-bottom: 1.2rem;
+        }
+        
+        .activity-option {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(108, 64, 192, 0.1);
+        }
+        
+        .activity-radio {
+            margin-right: 0.8rem;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            outline: none;
+            position: relative;
+        }
+        
+        .activity-radio:checked {
+            border-color: var(--primary-color);
+        }
+        
+        .activity-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+        
+        .activity-label {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .activity-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: var(--text-color);
+        }
+        
+        .activity-description {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+        
+        .share-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+        
+        .share-popup.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .share-popup-container {
+            width: 100%;
+            max-width: 100%;
+            background-color: var(--background-color);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 -4px 30px rgba(0,0,0,0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        .share-popup.visible .share-popup-container {
+            transform: translateY(0);
+        }
+        
+        .share-popup-content {
+            padding: 20px;
+        }
+        
+        .share-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .share-popup-header h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 18px;
+        }
+        
+        .close-share {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--secondary-text);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .close-share:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .share-text {
+            background-color: var(--background-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            font-size: 15px;
+            line-height: 1.4;
+            border: 1px solid var(--border-color);
+        }
+        
+        .share-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .share-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .share-option:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .share-option:active {
+            transform: scale(0.97);
+        }
+        
+        .share-option-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+        }
+        
+        .share-option-icon.whatsapp {
+            background-color: #25D366;
+        }
+        
+        .share-option-icon.email {
+            background-color: #54a0ff;
+        }
+        
+        .share-option-icon.copy {
+            background-color: #8880FE;
+        }
+        
+        .share-option-name {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .toast i {
+            color: white;
+            font-size: 18px;
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
+        
+        .units-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            padding: 0.3rem;
+            border: 1px solid var(--border-color);
+            max-width: 250px;
+        }
+        
+        .unit-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+        
+        .unit-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .activity-info {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            margin-top: 0.5rem;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .share-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .share-button:hover {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+        
+        .share-button:active {
+            transform: scale(0.98);
+        }
+        
+        @media (max-width: 480px) {
+            .bmr-card {
+                padding: 1.2rem;
+            }
+            
+            .bmr-value {
+                font-size: 2rem;
+            }
+            
+            .bmr-gender-option i {
+                font-size: 1.5rem;
+            }
+            
+            .bmr-result-content {
+                padding: 1.5rem;
+            }
+            
+            .share-popup-content {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header style="z-index: 1000;">
+            <div class="header-left">
+                <a class="back-button" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left" style="font-size: 1.5rem;"></i>
+                </a>
+                <h1 style="margin-left: 10px;">BMR</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="userProfileIcon" onclick="window.location.href='settings.html'">
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="BMR-CON">
+            <div class="bmr-container">
+                <div class="units-toggle">
+                    <div class="unit-option active" id="metricUnit">Metric</div>
+                    <div class="unit-option" id="imperialUnit">Imperial</div>
+                </div>
+                
+                <div class="bmr-card">
+                    <div class="bmr-gender-container">
+                        <div class="bmr-gender-option selected" data-gender="male">
+                            <i class="fas fa-male"></i>
+                            <span>Male</span>
+                        </div>
+                        <div class="bmr-gender-option" data-gender="female">
+                            <i class="fas fa-female"></i>
+                            <span>Female</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bmr-form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" placeholder="Years" min="15" max="80">
+                        <div class="error-message" id="ageError">Please enter a valid age (15-80)</div>
+                    </div>
+                    
+                    <div id="metricInputs">
+                        <div class="bmr-form-group">
+                            <label for="height">Height</label>
+                            <input type="number" id="height" placeholder="Centimeters" step="0.1" min="50" max="250">
+                            <div class="error-message" id="heightError">Please enter a valid height</div>
+                        </div>
+                        
+                        <div class="bmr-form-group">
+                            <label for="weight">Weight</label>
+                            <input type="number" id="weight" placeholder="Kilograms" step="0.1" min="10" max="300">
+                            <div class="error-message" id="weightError">Please enter a valid weight</div>
+                        </div>
+                    </div>
+                    
+                    <div id="imperialInputs" style="display: none;">
+                        <div class="bmr-form-group">
+                            <label for="heightFt">Height</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="heightFt" placeholder="Feet" min="1" max="8" style="width: 50%;">
+                                <input type="number" id="heightIn" placeholder="Inches" min="0" max="11" style="width: 50%;">
+                            </div>
+                            <div class="error-message" id="heightImperialError">Please enter a valid height</div>
+                        </div>
+                        
+                        <div class="bmr-form-group">
+                            <label for="weightLbs">Weight (kg)</label>
+                            <input type="number" id="weightLbs" placeholder="Kilograms" step="0.1" min="5" max="300">
+                            <div class="error-message" id="weightImperialError">Please enter a valid weight</div>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-level-container">
+                        <label>Activity Level</label>
+                        
+                        <div class="activity-option selected" data-activity="1.2">
+                            <input type="radio" name="activity" class="activity-radio" checked>
+                            <div class="activity-label">
+                                <span class="activity-name">Sedentary</span>
+                                <span class="activity-description">Little or no exercise</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option" data-activity="1.375">
+                            <input type="radio" name="activity" class="activity-radio">
+                            <div class="activity-label">
+                                <span class="activity-name">Lightly Active</span>
+                                <span class="activity-description">Light exercise 1-3 days/week</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option" data-activity="1.55">
+                            <input type="radio" name="activity" class="activity-radio">
+                            <div class="activity-label">
+                                <span class="activity-name">Moderately Active</span>
+                                <span class="activity-description">Moderate exercise 3-5 days/week</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option" data-activity="1.725">
+                            <input type="radio" name="activity" class="activity-radio">
+                            <div class="activity-label">
+                                <span class="activity-name">Very Active</span>
+                                <span class="activity-description">Hard exercise 6-7 days/week</span>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-option" data-activity="1.9">
+                            <input type="radio" name="activity" class="activity-radio">
+                            <div class="activity-label">
+                                <span class="activity-name">Extra Active</span>
+                                <span class="activity-description">Very hard exercise & physical job</span>
+                            </div>
+                        </div>
+                        
+                        <p class="activity-info">Select the option that best describes your typical weekly activity</p>
+                    </div>
+                    
+                    <button class="calculate-btn" id="calculateBtn">Calculate BMR</button>
+                    
+                    <div class="bmr-result popup" id="bmrResult">
+                        <div class="bmr-result-content">
+                            <button class="close-result" id="closeResult">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            
+                            <h3>Your Basal Metabolic Rate</h3>
+                            <div class="bmr-value" id="bmrValue">1,500</div>
+                            <p>calories/day</p>
+                            
+                            <div class="calories-section">
+                                <div class="calories-title">Daily Calorie Needs</div>
+                                <div class="calories-grid">
+                                    <div class="calorie-box">
+                                        <div class="calorie-box-title">To Maintain Weight</div>
+                                        <div class="calorie-value" id="maintainCalories">2,000</div>
+                                    </div>
+                                    <div class="calorie-box">
+                                        <div class="calorie-box-title">Mild Weight Loss</div>
+                                        <div class="calorie-value" id="mildLossCalories">1,800</div>
+                                    </div>
+                                    <div class="calorie-box">
+                                        <div class="calorie-box-title">Weight Loss</div>
+                                        <div class="calorie-value" id="lossCalories">1,600</div>
+                                    </div>
+                                    <div class="calorie-box">
+                                        <div class="calorie-box-title">Weight Gain</div>
+                                        <div class="calorie-value" id="gainCalories">2,200</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bmr-description">
+                                <p>Your BMR is the number of calories your body needs to perform basic functions at rest. This is affected by your age, gender, weight, and height.</p>
+                                <p>The activity level you selected adjusts the total daily calories needed to maintain your current weight.</p>
+                            </div>
+                            
+                            <div class="bmr-formula" id="bmrFormula">
+                                BMR Formula (Mifflin-St Jeor Equation):
+                                <br>Men: 10 × weight(kg) + 6.25 × height(cm) - 5 × age + 5
+                                <br>Women: 10 × weight(kg) + 6.25 × height(cm) - 5 × age - 161
+                            </div>
+                            
+                            <button class="share-button" id="shareBtn">
+                                <i class="fas fa-share-alt"></i>
+                                <span>Share Results</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Share Popup -->
+        <div class="share-popup" id="sharePopup">
+            <div class="share-popup-container">
+                <div class="share-popup-content">
+                    <div class="share-popup-header">
+                        <h3>Share Your BMR Result</h3>
+                        <button class="close-share" id="closeShare">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <p class="share-text" id="copyText">My BMR is 1,500 calories/day calculated with X-fitLife app!</p>
+                    <div class="share-options">
+                        <div class="share-option" id="shareWhatsapp">
+                            <div class="share-option-icon whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <span class="share-option-name">WhatsApp</span>
+                        </div>
+                        <div class="share-option" id="shareEmail">
+                            <div class="share-option-icon email">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <span class="share-option-name">Email</span>
+                        </div>
+                        <div class="share-option" id="shareCopy">
+                            <div class="share-option-icon copy">
+                                <i class="fas fa-copy"></i>
+                            </div>
+                            <span class="share-option-name">Copy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast notification -->
+        <div class="toast" id="toast">
+            <i class="fas fa-check-circle"></i>
+            <span>Copied to clipboard!</span>
+        </div>
+        
+        <nav class="bottom-nav" style="z-index: 100;">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <div class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>Explore</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Ask</span>
+            </div>
+            <a href="notes.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Notes</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user profile image if available
+            const userProfileIcon = document.getElementById('userProfileIcon');
+            const profileCircle = userProfileIcon.querySelector('.profile-circle');
+            
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('xfitUser'));
+            if (userData && userData.profileImage) {
+                profileCircle.innerHTML = `<img src="${userData.profileImage}" alt="${userData.username}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            }
+            
+            // Elements
+            const metricUnitBtn = document.getElementById('metricUnit');
+            const imperialUnitBtn = document.getElementById('imperialUnit');
+            const metricInputs = document.getElementById('metricInputs');
+            const imperialInputs = document.getElementById('imperialInputs');
+            const genderOptions = document.querySelectorAll('.bmr-gender-option');
+            const activityOptions = document.querySelectorAll('.activity-option');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const bmrResult = document.getElementById('bmrResult');
+            const bmrValue = document.getElementById('bmrValue');
+            const maintainCalories = document.getElementById('maintainCalories');
+            const mildLossCalories = document.getElementById('mildLossCalories');
+            const lossCalories = document.getElementById('lossCalories');
+            const gainCalories = document.getElementById('gainCalories');
+            const bmrFormula = document.getElementById('bmrFormula');
+            const shareBtn = document.getElementById('shareBtn');
+            const closeResult = document.getElementById('closeResult');
+            const sharePopup = document.getElementById('sharePopup');
+            const closeShare = document.getElementById('closeShare');
+            const copyText = document.getElementById('copyText');
+            const shareWhatsapp = document.getElementById('shareWhatsapp');
+            const shareEmail = document.getElementById('shareEmail');
+            const shareCopy = document.getElementById('shareCopy');
+            const toast = document.getElementById('toast');
+            
+            // Input fields
+            const ageInput = document.getElementById('age');
+            const heightInput = document.getElementById('height');
+            const weightInput = document.getElementById('weight');
+            const heightFtInput = document.getElementById('heightFt');
+            const heightInInput = document.getElementById('heightIn');
+            const weightLbsInput = document.getElementById('weightLbs');
+            
+            // Error message elements
+            const ageError = document.getElementById('ageError');
+            const heightError = document.getElementById('heightError');
+            const weightError = document.getElementById('weightError');
+            const heightImperialError = document.getElementById('heightImperialError');
+            const weightImperialError = document.getElementById('weightImperialError');
+            
+            // Variables
+            let currentUnit = 'metric';
+            let selectedGender = 'male';
+            let activityFactor = 1.2; // Default: Sedentary
+            
+            // Toggle between metric and imperial units
+            metricUnitBtn.addEventListener('click', function() {
+                currentUnit = 'metric';
+                metricUnitBtn.classList.add('active');
+                imperialUnitBtn.classList.remove('active');
+                metricInputs.style.display = 'block';
+                imperialInputs.style.display = 'none';
+                resetForm();
+            });
+            
+            imperialUnitBtn.addEventListener('click', function() {
+                currentUnit = 'imperial';
+                imperialUnitBtn.classList.add('active');
+                metricUnitBtn.classList.remove('active');
+                imperialInputs.style.display = 'block';
+                metricInputs.style.display = 'none';
+                resetForm();
+            });
+            
+            // Select gender
+            genderOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    genderOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedGender = this.getAttribute('data-gender');
+                });
+            });
+            
+            // Select activity level
+            activityOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    activityOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Set the radio button checked
+                    this.querySelector('.activity-radio').checked = true;
+                    
+                    // Update activity factor
+                    activityFactor = parseFloat(this.getAttribute('data-activity'));
+                });
+            });
+            
+            // Validate input fields
+            function validateInputs() {
+                let isValid = true;
+                
+                // Reset error messages
+                ageError.style.display = 'none';
+                heightError.style.display = 'none';
+                weightError.style.display = 'none';
+                heightImperialError.style.display = 'none';
+                weightImperialError.style.display = 'none';
+                
+                // Validate age
+                const age = parseInt(ageInput.value);
+                if (isNaN(age) || age < 15 || age > 80) {
+                    ageError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (currentUnit === 'metric') {
+                    // Validate height (metric)
+                    const height = parseFloat(heightInput.value);
+                    if (isNaN(height) || height < 50 || height > 250) {
+                        heightError.style.display = 'block';
+                        isValid = false;
+                    }
+                    
+                    // Validate weight (metric)
+                    const weight = parseFloat(weightInput.value);
+                    if (isNaN(weight) || weight < 10 || weight > 300) {
+                        weightError.style.display = 'block';
+                        isValid = false;
+                    }
+                } else {
+                    // Validate height (imperial)
+                    const heightFt = parseInt(heightFtInput.value);
+                    const heightIn = parseInt(heightInInput.value) || 0;
+                    
+                    if (isNaN(heightFt) || heightFt < 1 || heightFt > 8 || isNaN(heightIn) || heightIn < 0 || heightIn > 11) {
+                        heightImperialError.style.display = 'block';
+                        isValid = false;
+                    }
+                    
+                    // Validate weight (imperial - now in kg)
+                    const weightLbs = parseFloat(weightLbsInput.value);
+                    if (isNaN(weightLbs) || weightLbs < 5 || weightLbs > 300) {
+                        weightImperialError.style.display = 'block';
+                        isValid = false;
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            // Calculate BMR using Mifflin-St Jeor Equation
+            function calculateBMR() {
+                let weight, height, age;
+                
+                age = parseInt(ageInput.value);
+                
+                if (currentUnit === 'metric') {
+                    height = parseFloat(heightInput.value); // in cm
+                    weight = parseFloat(weightInput.value); // in kg
+                } else {
+                    // Convert imperial to metric
+                    const heightFt = parseInt(heightFtInput.value);
+                    const heightIn = parseInt(heightInInput.value) || 0;
+                    const totalInches = (heightFt * 12) + heightIn;
+                    height = totalInches * 2.54; // Convert inches to cm
+                    
+                    const weightLbs = parseFloat(weightLbsInput.value);
+                    weight = weightLbs; // Already in kg
+                }
+                
+                // Mifflin-St Jeor Equation
+                let bmr;
+                if (selectedGender === 'male') {
+                    bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+                } else {
+                    bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+                }
+                
+                return bmr;
+            }
+            
+            // Format number with commas for thousands
+            function formatNumber(num) {
+                return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Display BMR result
+            function displayBMRResult(bmr) {
+                // Calculate calories based on activity level
+                const maintainCal = bmr * activityFactor;
+                const mildLossCal = maintainCal - 250; // 250 calorie deficit for mild weight loss
+                const lossCal = maintainCal - 500; // 500 calorie deficit for weight loss
+                const gainCal = maintainCal + 500; // 500 calorie surplus for weight gain
+                
+                // Update result display
+                bmrValue.textContent = formatNumber(bmr);
+                maintainCalories.textContent = formatNumber(maintainCal);
+                mildLossCalories.textContent = formatNumber(mildLossCal);
+                lossCalories.textContent = formatNumber(lossCal);
+                gainCalories.textContent = formatNumber(gainCal);
+                
+                // Update formula display based on gender
+                if (selectedGender === 'male') {
+                    bmrFormula.innerHTML = `
+                        BMR Formula (Mifflin-St Jeor Equation):<br>
+                        Men: 10 × weight(kg) + 6.25 × height(cm) - 5 × age + 5
+                    `;
+                } else {
+                    bmrFormula.innerHTML = `
+                        BMR Formula (Mifflin-St Jeor Equation):<br>
+                        Women: 10 × weight(kg) + 6.25 × height(cm) - 5 × age - 161
+                    `;
+                }
+                
+                // Update share text
+                copyText.textContent = `My BMR is ${formatNumber(bmr)} calories/day calculated with X-fitLife app!`;
+                
+                // Show result with animation
+                setTimeout(() => {
+                    bmrResult.classList.add('visible');
+                }, 10);
+                
+                // Scroll to result
+                setTimeout(() => {
+                    bmrResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 300);
+            }
+            
+            // Reset form and hide result
+            function resetForm() {
+                bmrResult.classList.remove('visible');
+                
+                // Reset error messages
+                ageError.style.display = 'none';
+                heightError.style.display = 'none';
+                weightError.style.display = 'none';
+                heightImperialError.style.display = 'none';
+                weightImperialError.style.display = 'none';
+            }
+            
+            // Calculate button click event
+            calculateBtn.addEventListener('click', function() {
+                if (validateInputs()) {
+                    const bmr = calculateBMR();
+                    displayBMRResult(bmr);
+                    
+                    // Save to local storage if user is logged in
+                    if (userData) {
+                        // Store BMR calculation
+                        if (!userData.bmrHistory) {
+                            userData.bmrHistory = [];
+                        }
+                        
+                        userData.bmrHistory.push({
+                            date: new Date().toISOString(),
+                            bmr: Math.round(bmr),
+                            activityFactor: activityFactor,
+                            weight: currentUnit === 'metric' ? 
+                                parseFloat(weightInput.value) : 
+                                parseFloat(weightLbsInput.value),
+                            unit: currentUnit
+                        });
+                        
+                        // Limit history to last 10 entries
+                        if (userData.bmrHistory.length > 10) {
+                            userData.bmrHistory = userData.bmrHistory.slice(-10);
+                        }
+                        
+                        localStorage.setItem('xfitUser', JSON.stringify(userData));
+                    }
+                }
+            });
+            
+            // Close result popup
+            closeResult.addEventListener('click', function() {
+                bmrResult.classList.remove('visible');
+            });
+            
+            // Share button click event
+            shareBtn.addEventListener('click', function() {
+                sharePopup.classList.add('visible');
+            });
+            
+            // Close share popup
+            closeShare.addEventListener('click', function() {
+                sharePopup.classList.remove('visible');
+            });
+            
+            // Share via WhatsApp
+            shareWhatsapp.addEventListener('click', function() {
+                const text = encodeURIComponent(copyText.textContent);
+                window.open(`https://wa.me/?text=${text}`, '_blank');
+                setTimeout(() => {
+                    sharePopup.classList.remove('visible');
+                }, 300);
+            });
+            
+            // Share via Email
+            shareEmail.addEventListener('click', function() {
+                const subject = encodeURIComponent('My BMR Result');
+                const body = encodeURIComponent(copyText.textContent);
+                window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+                setTimeout(() => {
+                    sharePopup.classList.remove('visible');
+                }, 300);
+            });
+            
+            // Copy to clipboard
+            shareCopy.addEventListener('click', function() {
+                navigator.clipboard.writeText(copyText.textContent).then(() => {
+                    toast.classList.add('visible');
+                    setTimeout(() => {
+                        toast.classList.remove('visible');
+                    }, 2000);
+                    
+                    // Close share popup after copying
+                    setTimeout(() => {
+                        sharePopup.classList.remove('visible');
+                    }, 300);
+                });
+            });
+            
+            // Close popups when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === bmrResult) {
+                    bmrResult.classList.remove('visible');
+                }
+                if (e.target === sharePopup) {
+                    sharePopup.classList.remove('visible');
+                }
+            });
+            
+            // Load user data if available
+            if (userData) {
+                // Set gender if available
+                if (userData.gender) {
+                    selectedGender = userData.gender;
+                    genderOptions.forEach(option => {
+                        if (option.getAttribute('data-gender') === selectedGender) {
+                            option.classList.add('selected');
+                        } else {
+                            option.classList.remove('selected');
+                        }
+                    });
+                }
+                
+                // Set age if available
+                if (userData.age) {
+                    ageInput.value = userData.age;
+                }
+                
+                // If there's BMR history, pre-fill the last entered weight
+                if (userData.bmrHistory && userData.bmrHistory.length > 0) {
+                    const lastEntry = userData.bmrHistory[userData.bmrHistory.length - 1];
+                    
+                    if (lastEntry.unit === 'metric') {
+                        weightInput.value = lastEntry.weight;
+                    } else {
+                        // Weight is already in kg
+                        weightLbsInput.value = lastEntry.weight;
+                    }
+                    
+                    // Set activity level if available
+                    if (lastEntry.activityFactor) {
+                        activityFactor = lastEntry.activityFactor;
+                        activityOptions.forEach(option => {
+                            if (Math.abs(parseFloat(option.getAttribute('data-activity')) - activityFactor) < 0.01) {
+                                option.classList.add('selected');
+                                option.querySelector('.activity-radio').checked = true;
+                            } else {
+                                option.classList.remove('selected');
+                                option.querySelector('.activity-radio').checked = false;
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

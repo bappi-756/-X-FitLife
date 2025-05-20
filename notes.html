@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - XfitLife</title>
+    <link rel="icon" href="icons/x-fit.ico">
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#6c40c0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="X-fitLife">
+        <link rel="apple-touch-icon" href="icons/x-fit.png">
+        <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="notes.css">
+</head>
+<body>
+    <div class="app-container">
+        <header style="z-index: 1000;">
+            <div class="header-left">
+                <a class="back-button" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1>Notes</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="userProfileIcon" onclick="window.location.href='settings.html'">
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="content notes-content">
+            <div class="notes-toolbar">
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchNotes" placeholder="Search your notes...">
+                </div>
+                <div class="notes-sort">
+                    <button id="sortButton">
+                        <i class="fas fa-sort"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="notes-list" id="notesList">
+                <!-- Notes will be dynamically added here -->
+            </div>
+            
+            <div class="notes-empty" id="notesEmpty">
+                <div class="empty-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>Your fitness journal awaits</h3>
+                <p>Add your first note to start tracking your fitness journey.</p>
+            </div>
+            
+            <button class="add-note-btn" id="addNoteBtn">
+                <i class="fas fa-plus"></i>
+            </button>
+            
+            <button class="scroll-top-btn" id="scrollTopBtn">
+                <i class="fas fa-chevron-up" style="color: var(--text-color);"></i>
+            </button>
+        </main>
+        
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="explore.html" class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>Explore</span>
+            </a>
+            <a href="ask.html" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Ask</span>
+            </a>
+            <div class="nav-item active">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Notes</span>
+            </div>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <!-- Note Editor Modal -->
+        <div class="note-modal" id="noteModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Fitness Note</h2>
+                    <button class="close-modal" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="noteTitle">Title</label>
+                        <input type="text" id="noteTitle" placeholder="Short title (max 40 characters)" maxlength="40">
+                    </div>
+                    <div class="form-group">
+                        <label for="noteContent">Your note</label>
+                        <textarea id="noteContent" placeholder="Start typing your fitness note here..." rows="8"></textarea>
+                    </div>
+                    <div class="note-category-selector">
+                        <div class="category-label">Category:</div>
+                        <div class="category-options">
+                            <div class="category-option" data-category="workout" data-color="#8880FE">
+                                <i class="fas fa-dumbbell"></i>
+                                <span>Workout</span>
+                            </div>
+                            <div class="category-option" data-category="nutrition" data-color="#1dd1a1">
+                                <i class="fas fa-apple-alt"></i>
+                                <span>Nutrition</span>
+                            </div>
+                            <div class="category-option" data-category="goals" data-color="#ff6b6b">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Goals</span>
+                            </div>
+                            <div class="category-option" data-category="other" data-color="#54a0ff">
+                                <i class="fas fa-sticky-note"></i>
+                                <span>Other</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-actions">
+                        <button class="action-btn delete-note" id="deleteNote" title="Delete note">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="action-btn complete-note" id="completeNote" title="Mark as completed">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                    <button class="save-note" id="saveNote">Save Note</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Popup -->
+        <div class="delete-popup" id="deletePopup">
+            <div class="delete-popup-content">
+                <div class="delete-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Delete Note?</h3>
+                <p>This action cannot be undone.</p>
+                <div class="delete-popup-actions">
+                    <button class="cancel-delete" id="cancelDelete">Cancel</button>
+                    <button class="confirm-delete" id="confirmDelete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script src="notes.js"></script>
+</body>
+</html> 

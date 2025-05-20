@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <link rel="icon" href="icons/x-fit.ico">
+</head>
+<body>
+    <h1>Testing API for Fitness Tips</h1>
+    <div id="result">Loading fitness tip...</div>
+
+    <script>
+        const API_KEY = "AIzaSyDFdYDjLbyC73TdejXW6oUWQoAJUVvxPPE";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        
+        const prompt = {
+            contents: [{
+                parts: [{
+                    text: "Generate a short, concise fitness tip that is practical and motivational. Keep it under 80 characters. Don't use hashtags or emojis. Don't include quotes."
+                }]
+            }]
+        };
+        
+        async function fetchTip() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(prompt)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log("API Response:", data);
+                
+                let tip = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "No tip generated";
+                document.getElementById("result").textContent = tip;
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("result").textContent = "Error: " + error.message;
+            }
+        }
+        
+        // Fetch tip when page loads
+        fetchTip();
+    </script>
+</body>
+</html> 

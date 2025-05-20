@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tips - XfitLife</title>
+    <link rel="icon" href="icons/x-fit.ico">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6c40c0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="X-fitLife">
+    <link rel="apple-touch-icon" href="icons/x-fit.png">
+    <link rel="manifest" href="manifest.json">
+    <!-- End PWA Meta Tags -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        
+        .tip-search {
+            display: flex;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .tip-search input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            padding-right: 50px;
+        }
+        
+        .tip-search button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 50px;
+            border: none;
+            background: transparent;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .category-chips {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 0 0 15px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .category-chips::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-chip {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .category-chip.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .tip-card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .tip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .tip-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+        }
+        
+        .tip-category {
+            font-size: 0.8rem;
+            background-color: rgba(136, 128, 254, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .tip-content {
+            color: var(--text-color);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .tip-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .tip-action {
+            display: flex;
+            align-items: center;
+            color: var(--text-color-light);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .tip-action i {
+            margin-right: 5px;
+        }
+        
+        .loading-spinner {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(136, 128, 254, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: 40px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-color-light);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .ai-indicator {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.8rem;
+            color: var(--text-color-light);
+            margin-top: 10px;
+        }
+        
+        .ai-indicator i {
+            color: var(--primary-color);
+        }
+        
+        .ai-tag {
+            background-color: rgba(136, 128, 254, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        /* Quick prompt buttons */
+        .quick-prompts {
+            margin: 15px 0;
+        }
+        
+        .quick-prompts-title {
+            font-size: 0.9rem;
+            color: var(--text-color-light);
+            margin-bottom: 10px;
+        }
+        
+        .prompt-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .prompt-button {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex: 1;
+            min-width: 160px;
+            text-align: center;
+        }
+        
+        .prompt-button:hover {
+            background-color: rgba(136, 128, 254, 0.1);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tip-card {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Add skeleton loading styles */
+        .skeleton-tip {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skeleton-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .skeleton-title {
+            height: 24px;
+            width: 70%;
+            background: linear-gradient(90deg, var(--border-color) 0%, var(--border-color-light) 50%, var(--border-color) 100%);
+            border-radius: 5px;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        .skeleton-category {
+            height: 20px;
+            width: 20%;
+            background: linear-gradient(90deg, var(--border-color) 0%, var(--border-color-light) 50%, var(--border-color) 100%);
+            border-radius: 10px;
+            animation: skeleton-loading 1.5s infinite;
+            animation-delay: 0.2s;
+        }
+        
+        .skeleton-content {
+            height: 80px;
+            background: linear-gradient(90deg, var(--border-color) 0%, var(--border-color-light) 50%, var(--border-color) 100%);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            animation: skeleton-loading 1.5s infinite;
+            animation-delay: 0.4s;
+        }
+        
+        .skeleton-actions {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .skeleton-action {
+            height: 20px;
+            width: 60px;
+            background: linear-gradient(90deg, var(--border-color) 0%, var(--border-color-light) 50%, var(--border-color) 100%);
+            border-radius: 5px;
+            animation: skeleton-loading 1.5s infinite;
+            animation-delay: 0.6s;
+        }
+        
+        @keyframes skeleton-loading {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        /* Offline mode styles */
+        .offline-mode {
+            position: relative;
+        }
+        
+        .offline-mode::after {
+            content: "Offline Mode";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+            z-index: 1000;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .offline-mode::after {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-left">
+                <a class="back-button" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left" style="font-size: 1.5rem;"></i>
+                </a>
+                <h1 style="margin-left: 10px;">X-fit Tips</h1>
+            </div>
+            <div class="header-right">
+                <button id="refreshTips" style="background: transparent; border: none; margin-right: 15px; cursor: pointer; color: var(--text-color);">
+                    <i class="fas fa-sync-alt" style="font-size: 1.2rem;"></i>
+                </button>
+                <div class="user-profile" id="userProfileIcon" onclick="window.location.href='settings.html'">
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="content" style="padding: 0.6rem;">
+            <div class="tips-container">
+                <div class="tip-search">
+                    <input type="text" id="tipQuery" placeholder="Ask for fitness advice...">
+                    <button id="searchButton"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="category-chips">
+                    <div class="category-chip active" data-category="all">All Tips</div>
+                    <div class="category-chip" data-category="workout">Workouts</div>
+                    <div class="category-chip" data-category="nutrition">Nutrition</div>
+                    <div class="category-chip" data-category="motivation">Motivation</div>
+                    <div class="category-chip" data-category="recovery">Recovery</div>
+                    <div class="category-chip" data-category="beginner">For Beginners</div>
+                </div>
+                
+                <div class="last-updated" style="font-size: 0.8rem; color: var(--text-color-light); margin-bottom: 15px; text-align: right;">
+                    <span id="lastUpdatedText">Tips updated today</span>
+                </div>
+                
+                <div class="quick-prompts" style="display: none;">
+                    <div class="quick-prompts-title">Try asking about:</div>
+                    <div class="prompt-buttons">
+                        <div class="prompt-button" data-prompt="How to start running as a beginner">Running for beginners</div>
+                        <div class="prompt-button" data-prompt="What should I eat before a workout?">Pre-workout meals</div>
+                        <div class="prompt-button" data-prompt="How to stay motivated to exercise">Staying motivated</div>
+                        <div class="prompt-button" data-prompt="Best exercises for weight loss">Weight loss exercises</div>
+                    </div>
+                </div>
+                
+                <div id="tipsContent">
+                    <!-- This will be populated with tip cards -->
+                    <div class="empty-state">
+                        <i class="fas fa-lightbulb"></i>
+                        <p>Ask X-Ask Tips for fitness advice!</p>
+                        <div class="ai-indicator">
+                            <i class="fas fa-bolt"></i>
+                            <span>Powered by <span class="ai-tag">X-Ask AI</span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="loading-spinner" id="loadingSpinner"></div>
+            </div>
+        </main>
+        
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="explore.html" class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>Explore</span>
+            </a>
+            <a href="ask.html" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Ask</span>
+            </a>
+            <a href="notes.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Notes</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        
+        <div class="toast" id="toast"></div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API configuration (hidden from end users)
+            const API_KEY = "AIzaSyDFdYDjLbyC73TdejXW6oUWQoAJUVvxPPE";
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+            
+            // Elements
+            const tipQuery = document.getElementById('tipQuery');
+            const searchButton = document.getElementById('searchButton');
+            const tipsContent = document.getElementById('tipsContent');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const categoryChips = document.querySelectorAll('.category-chip');
+            const promptButtons = document.querySelectorAll('.prompt-button');
+            const toast = document.getElementById('toast');
+            
+            // Update user profile icon if available
+            const userProfileIcon = document.getElementById('userProfileIcon');
+            const profileCircle = userProfileIcon.querySelector('.profile-circle');
+            
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('xfitUser'));
+            if (userData && userData.profileImage) {
+                profileCircle.innerHTML = `<img src="${userData.profileImage}" alt="${userData.username}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            }
+            
+            // Daily rotating sample tips using Gemini API
+            let sampleTips = [];
+            
+            // Default fallback tips in case API fails
+            const fallbackTips = [
+                {
+                    id: 'tip-1',
+                    title: "Proper Hydration During Workouts",
+                    category: "nutrition",
+                    content: "Make sure to drink 16-20 ounces of water 2-3 hours before exercise, and another 8 ounces 20-30 minutes before starting. During your workout, try to consume 7-10 ounces every 10-20 minutes. After exercising, drink 8 ounces within 30 minutes and continue hydrating with 16-24 ounces for each pound lost during the workout.",
+                    likes: 24
+                },
+                {
+                    id: 'tip-2',
+                    title: "Recovery Day Importance",
+                    category: "recovery",
+                    content: "Rest days are crucial for muscle growth and preventing injury. Your body needs time to repair and strengthen itself between workouts. Active recovery such as light walking, swimming or yoga can promote blood flow without taxing your system further. Aim for 1-2 rest days per week, depending on your training intensity.",
+                    likes: 17
+                },
+                {
+                    id: 'tip-3',
+                    title: "Beginner's Guide to Creating a Workout Routine",
+                    category: "beginner",
+                    content: "When starting out, focus on consistency over intensity. Begin with 2-3 workout days per week, incorporating both cardio and strength training. Start with 20-30 minute sessions and gradually increase duration and intensity. Include basic compound movements like squats, push-ups and planks that work multiple muscle groups simultaneously.",
+                    likes: 36
+                }
+            ];
+            
+            // Check for online/offline status
+            let isOnline = navigator.onLine;
+            
+            // Add network status listeners
+            window.addEventListener('online', function() {
+                isOnline = true;
+                showToast("You're back online!");
+                
+                // Register background sync to update data
+                if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.sync.register('sync-tips-data')
+                            .then(() => {
+                                console.log('Background sync registered!');
+                            })
+                            .catch(err => {
+                                console.error('Background sync registration failed:', err);
+                            });
+                    });
+                }
+                
+                // Update UI
+                document.querySelector('.app-container').classList.remove('offline-mode');
+            });
+            
+            window.addEventListener('offline', function() {
+                isOnline = false;
+                showToast("You're offline. Using cached data.");
+                
+                // Update UI to show offline mode
+                document.querySelector('.app-container').classList.add('offline-mode');
+            });
+            
+            // Add offline mode indicator style
+            const style = document.createElement('style');
+            style.textContent = `
+                .offline-mode {
+                    position: relative;
+                }
+                
+                .offline-mode::after {
+                    content: "Offline Mode";
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    padding: 4px;
+                    font-size: 0.8rem;
+                    text-align: center;
+                    z-index: 1000;
+                }
+                
+                @media (prefers-color-scheme: dark) {
+                    .offline-mode::after {
+                        background-color: rgba(255, 255, 255, 0.2);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // If offline on page load, show indicator
+            if (!isOnline) {
+                document.querySelector('.app-container').classList.add('offline-mode');
+            }
+            
+            // Check if we need to fetch new daily tips
+            async function loadDailyTips() {
+                const lastUpdatedText = document.getElementById('lastUpdatedText');
+                
+                try {
+                    // Check if we have any tips in localStorage
+                    const today = new Date().toDateString();
+                    const storedTips = JSON.parse(localStorage.getItem('xfitDailyTips')) || {};
+                    
+                    // Show skeleton loader while checking for cached tips
+                    if (!storedTips.tips || storedTips.tips.length === 0) {
+                        showSkeletonLoader();
+                    } else {
+                        // Immediately show cached tips if available
+                        sampleTips = storedTips.tips;
+                        displayTips(sampleTips);
+                        initializeSampleTipCounts();
+                        
+                        // Update last updated text
+                        if (storedTips.date === today) {
+                            lastUpdatedText.textContent = `Tips updated today`;
+                        } else {
+                            const lastUpdateDate = new Date(storedTips.date);
+                            const formattedDate = lastUpdateDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                            });
+                            lastUpdatedText.textContent = `Last updated on ${formattedDate}`;
+                        }
+                    }
+                    
+                    // Check if we need to refresh tips (in background if we already have cached ones)
+                    const needsRefresh = !storedTips.date || storedTips.date !== today;
+                    
+                    if (needsRefresh) {
+                        // If we don't have cached tips, show loading spinner
+                        if (!storedTips.tips || storedTips.tips.length === 0) {
+                            loadingSpinner.style.display = 'block';
+                            lastUpdatedText.textContent = 'Updating tips...';
+                        } else {
+                            // Otherwise, silently update in background
+                            lastUpdatedText.textContent += ' (refreshing...)';
+                        }
+                        
+                        // Define tip categories to generate
+                        const tipCategories = [
+                            { category: "nutrition", prompt: "healthy eating for fitness" },
+                            { category: "workout", prompt: "effective workout technique" },
+                            { category: "recovery", prompt: "fitness recovery strategies" },
+                            { category: "beginner", prompt: "beginner fitness advice" },
+                            { category: "motivation", prompt: "fitness motivation tips" }
+                        ];
+                        
+                        // Prepare to collect new tips
+                        const newTips = [];
+                        
+                        // Promise for handling timeout
+                        const timeoutPromise = new Promise((_, reject) => {
+                            setTimeout(() => reject(new Error("API request timeout")), 15000);
+                        });
+                        
+                        // Process each tip category sequentially to avoid rate limits
+                        for (const tipCat of tipCategories) {
+                            try {
+                                const prompt = `As a fitness expert, provide a helpful tip about: ${tipCat.prompt}. 
+                                Format your response with a title and detailed explanation. 
+                                Keep it concise but informative, focusing on actionable advice.
+                                Sometimes you can use emojis.
+                                DO NOT mention that you are an AI or language model.
+                                DO NOT use the phrase "As a fitness expert" in your response.
+                                DO NOT use "my" or "I" pronouns in your response.
+                                DO NOT include any disclaimers.
+                                DO NOT include any leading phrases like "Here's a tip about..." or "Certainly, here's some advice...".
+                                DO NOT use asterisk symbols or any markdown formatting in your response.
+                                Write in a conversational, helpful tone exactly like ChatGPT would respond.
+                                Use plain text only, no formatting characters of any kind.
+                                Respond directly with the title and content only, keeping it straightforward and professional.
+                                every response finish you may use emojis.
+                                Behind xexis technology is Bappi Bhodro, a skilled software developer and founder of Xexis.`;
+                                
+                                // Make API request with timeout
+                                const responsePromise = fetch(API_URL, {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        contents: [
+                                            {
+                                                parts: [
+                                                    {
+                                                        text: prompt
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    })
+                                });
+                                
+                                // Race between the API request and the timeout
+                                const response = await Promise.race([responsePromise, timeoutPromise]);
+                                const data = await response.json();
+                                
+                                // Process API response
+                                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                                    const responseText = data.candidates[0].content.parts[0].text;
+                                    
+                                    // Parse the response text to extract title and content
+                                    let title = tipCat.prompt;
+                                    let content = responseText;
+                                    
+                                    // Try to extract title and content from the response
+                                    const lines = responseText.split('\n').filter(line => line.trim() !== '');
+                                    if (lines.length >= 1) {
+                                        // First line as title - remove asterisks and Markdown formatting
+                                        title = lines[0].replace(/^#+ /, '').replace(/\*/g, '').trim();
+                                        // Rest as content
+                                        content = lines.slice(1).join('\n').trim();
+                                    }
+                                    
+                                    // Create a new tip
+                                    const newTip = {
+                                        id: `tip-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                                        title: title,
+                                        category: tipCat.category,
+                                        content: content,
+                                        likes: Math.floor(Math.random() * 20) + 5
+                                    };
+                                    
+                                    newTips.push(newTip);
+                                    
+                                    // Small delay between API calls
+                                    await new Promise(resolve => setTimeout(resolve, 500));
+                                }
+                            } catch (error) {
+                                console.error(`Error fetching tip for ${tipCat.category}:`, error);
+                                // Continue with next category even if one fails
+                                continue;
+                            }
+                        }
+                        
+                        // If we successfully got new tips, use them
+                        if (newTips.length > 0) {
+                            // Update tips array and store in localStorage
+                            sampleTips = newTips;
+                            
+                            // Store today's tips in localStorage
+                            const tipsToStore = {
+                                date: today,
+                                tips: sampleTips
+                            };
+                            localStorage.setItem('xfitDailyTips', JSON.stringify(tipsToStore));
+                            
+                            // Update UI
+                            lastUpdatedText.textContent = 'Tips updated just now';
+                            displayTips(sampleTips);
+                            initializeSampleTipCounts();
+                            
+                            // Show toast if this was a background refresh
+                            if (storedTips.tips && storedTips.tips.length > 0) {
+                                showToast("Tips have been refreshed!");
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching daily tips:", error);
+                    // Use fallback tips in case of error
+                    if (!sampleTips || sampleTips.length === 0) {
+                        sampleTips = fallbackTips;
+                        lastUpdatedText.textContent = 'Using default tips';
+                        displayTips(sampleTips);
+                        initializeSampleTipCounts();
+                    }
+                } finally {
+                    loadingSpinner.style.display = 'none';
+                }
+            }
+            
+            // Function to show skeleton loader
+            function showSkeletonLoader() {
+                const skeletonHTML = `
+                    <div class="skeleton-tip">
+                        <div class="skeleton-header">
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-category"></div>
+                        </div>
+                        <div class="skeleton-content"></div>
+                        <div class="skeleton-actions">
+                            <div class="skeleton-action"></div>
+                            <div class="skeleton-action"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-tip">
+                        <div class="skeleton-header">
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-category"></div>
+                        </div>
+                        <div class="skeleton-content"></div>
+                        <div class="skeleton-actions">
+                            <div class="skeleton-action"></div>
+                            <div class="skeleton-action"></div>
+                        </div>
+                    </div>
+                `;
+                
+                tipsContent.innerHTML = skeletonHTML;
+            }
+            
+            // Load daily tips on page load
+            loadDailyTips();
+            
+            // Handle refresh button click - force refresh tips
+            document.getElementById('refreshTips').addEventListener('click', function() {
+                // Add rotation animation to refresh icon
+                const refreshIcon = this.querySelector('i');
+                refreshIcon.style.transition = 'transform 1s';
+                refreshIcon.style.transform = 'rotate(360deg)';
+                
+                // Force refresh by clearing stored tips and reloading
+                localStorage.removeItem('xfitDailyTips');
+                showToast("Fetching fresh tips for you...");
+                
+                // Reset icon after animation completes
+                setTimeout(() => {
+                    refreshIcon.style.transition = 'none';
+                    refreshIcon.style.transform = 'rotate(0deg)';
+                    setTimeout(() => {
+                        refreshIcon.style.transition = 'transform 1s';
+                    }, 50);
+                }, 1000);
+                
+                // Reload tips
+                loadDailyTips();
+            });
+            
+            // Handle search button click
+            searchButton.addEventListener('click', function() {
+                searchTips();
+            });
+            
+            // Handle enter key press in search input
+            tipQuery.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchTips();
+                }
+            });
+            
+            // Handle category chip clicks
+            categoryChips.forEach(chip => {
+                chip.addEventListener('click', function() {
+                    // Remove active class from all chips
+                    categoryChips.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked chip
+                    this.classList.add('active');
+                    
+                    // Filter tips by category
+                    const category = this.getAttribute('data-category');
+                    if (category === 'all') {
+                        displayTips(sampleTips);
+                    } else {
+                        const filteredTips = sampleTips.filter(tip => tip.category === category);
+                        if (filteredTips.length > 0) {
+                            displayTips(filteredTips);
+                        } else {
+                            // If no tips in this category, show empty state with category name
+                            tipsContent.innerHTML = `
+                                <div class="empty-state">
+                                    <i class="fas fa-filter"></i>
+                                    <p>No ${category} tips available yet.</p>
+                                    <p>Ask a question to get some!</p>
+                                </div>
+                            `;
+                        }
+                    }
+                });
+            });
+            
+            // Handle prompt button clicks
+            promptButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const prompt = this.getAttribute('data-prompt');
+                    tipQuery.value = prompt;
+                    searchTips();
+                });
+            });
+            
+            // Search for tips using the API
+            async function searchTips() {
+                const query = tipQuery.value.trim();
+                
+                if (!query) {
+                    showToast("Please enter a fitness question!");
+                    return;
+                }
+                
+                // Show loading spinner
+                tipsContent.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                
+                try {
+                    // Construct the prompt for the API
+                    const prompt = `As a fitness expert, provide a helpful tip about: ${query}. 
+                    Format your response with a title and detailed explanation. 
+                    Keep it concise but informative, focusing on actionable advice.
+                    Sometimes you can use emojis.
+                    DO NOT mention that you are an AI or language model.
+                    DO NOT use the phrase "As a fitness expert" in your response.
+                    DO NOT use "my" or "I" pronouns in your response.
+                    DO NOT include any disclaimers.
+                    DO NOT include any leading phrases like "Here's a tip about..." or "Certainly, here's some advice...".
+                    DO NOT use asterisk symbols or any markdown formatting in your response.
+                    Write in a conversational, helpful tone exactly like ChatGPT would respond.
+                    Use plain text only, no formatting characters of any kind.
+                    Respond directly with the title and content only, keeping it straightforward and professional.
+                    every response finish you may use emojis.
+                    Behind xexis technology is Bappi Bhodro, a skilled software developer and founder of Xexis.`;
+                    
+                    // Make API request
+                    const response = await fetch(API_URL, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            contents: [
+                                {
+                                    parts: [
+                                        {
+                                            text: prompt
+                                        }
+                                    ]
+                                }
+                            ]
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Process API response
+                    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        const responseText = data.candidates[0].content.parts[0].text;
+                        
+                        // Parse the response text to extract title and content
+                        let title = query;
+                        let content = responseText;
+                        
+                        // Try to extract title and content from the response
+                        const lines = responseText.split('\n').filter(line => line.trim() !== '');
+                        if (lines.length >= 1) {
+                            // First line as title - remove asterisks and Markdown formatting
+                            title = lines[0].replace(/^#+ /, '').replace(/\*/g, '').trim();
+                            // Rest as content
+                            content = lines.slice(1).join('\n').trim();
+                        }
+                        
+                        // Determine category based on the query and response
+                        let category = determineCategory(query, responseText);
+                        
+                        // Create a new tip and add it to our sample tips
+                        const newTip = {
+                            id: `tip-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                            title: title,
+                            category: category,
+                            content: content,
+                            likes: Math.floor(Math.random() * 20) + 1
+                        };
+                        
+                        // Add to beginning of array
+                        sampleTips.unshift(newTip);
+                        
+                        // Initialize like count in localStorage
+                        const likeCounts = JSON.parse(localStorage.getItem('xfitLikeCounts')) || {};
+                        likeCounts[newTip.id] = newTip.likes;
+                        localStorage.setItem('xfitLikeCounts', JSON.stringify(likeCounts));
+                        
+                        // Display the new tip
+                        displayTips([newTip]);
+                        
+                        // Reset category chips to "All"
+                        categoryChips.forEach(c => c.classList.remove('active'));
+                        categoryChips[0].classList.add('active');
+                    } else {
+                        throw new Error("No response from AI");
+                    }
+                } catch (error) {
+                    console.error("Error fetching tips:", error);
+                    tipsContent.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Sorry, couldn't generate tips right now.</p>
+                            <p>Please try again later.</p>
+                        </div>
+                    `;
+                } finally {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    tipsContent.style.display = 'block';
+                }
+            }
+            
+            // Display tips in the UI
+            function displayTips(tips) {
+                if (!tips || tips.length === 0) {
+                    tipsContent.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <p>No tips found. Try a different search!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Get liked tips from localStorage
+                const likedTips = JSON.parse(localStorage.getItem('xfitLikedTips')) || [];
+                // Get saved tips from localStorage
+                const savedTips = JSON.parse(localStorage.getItem('xfitSavedTips')) || [];
+                // Get like counts from localStorage
+                const likeCounts = JSON.parse(localStorage.getItem('xfitLikeCounts')) || {};
+                
+                let tipsHTML = '';
+                
+                tips.forEach((tip, index) => {
+                    // Check if this tip is liked
+                    const isLiked = likedTips.includes(tip.id);
+                    const heartIcon = isLiked ? 'fas fa-heart' : 'far fa-heart';
+                    const heartColor = isLiked ? 'color: #ff6b6b;' : '';
+                    
+                    // Check if this tip is saved
+                    const isSaved = savedTips.includes(tip.id);
+                    const bookmarkIcon = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark';
+                    const bookmarkColor = isSaved ? 'color: #feca57;' : '';
+                    
+                    // Get the stored like count or use the default
+                    const likeCount = likeCounts[tip.id] !== undefined ? likeCounts[tip.id] : tip.likes;
+                    
+                    tipsHTML += `
+                        <div class="tip-card" data-id="${tip.id}">
+                            <div class="tip-header">
+                                <h3 class="tip-title">${tip.title.replace(/\*/g, '')}</h3>
+                                <span class="tip-category">${capitalizeFirstLetter(tip.category)}</span>
+                            </div>
+                            <div class="tip-content">
+                                ${formatContent(tip.content)}
+                            </div>
+                            <div class="tip-actions">
+                                <div class="tip-action like-action">
+                                    <i class="${heartIcon}" style="${heartColor}"></i>
+                                    <span>${likeCount}</span>
+                                </div>
+                                <div class="tip-action save-action">
+                                    <i class="${bookmarkIcon}" style="${bookmarkColor}"></i>
+                                    <span>Save</span>
+                                </div>
+                            </div>
+                            <div class="ai-indicator">
+                                <i class="fas fa-bolt"></i>
+                                <span>Powered by <span class="ai-tag" onclick="window.location.href='https://oria-mobile.netlify.app/'">Oria X</span></span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                tipsContent.innerHTML = tipsHTML;
+                
+                // Add event listeners for tip actions
+                document.querySelectorAll('.like-action').forEach(action => {
+                    action.addEventListener('click', function() {
+                        const icon = this.querySelector('i');
+                        const count = this.querySelector('span');
+                        const tipCard = this.closest('.tip-card');
+                        const tipId = tipCard.getAttribute('data-id') || Date.now().toString();
+                        
+                        // Set data-id if it doesn't exist
+                        if (!tipCard.hasAttribute('data-id')) {
+                            tipCard.setAttribute('data-id', tipId);
+                        }
+                        
+                        // Get liked tips from localStorage or create empty array
+                        const likedTips = JSON.parse(localStorage.getItem('xfitLikedTips')) || [];
+                        
+                        // Get like counts from localStorage or create empty object
+                        const likeCounts = JSON.parse(localStorage.getItem('xfitLikeCounts')) || {};
+                        
+                        if (icon.classList.contains('far')) {
+                            // Like tip
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            icon.style.color = '#ff6b6b';
+                            
+                            // Update like count
+                            const newCount = parseInt(count.textContent) + 1;
+                            count.textContent = newCount;
+                            
+                            // Save new count to localStorage
+                            likeCounts[tipId] = newCount;
+                            localStorage.setItem('xfitLikeCounts', JSON.stringify(likeCounts));
+                            
+                            // Add to liked tips if not already there
+                            if (!likedTips.includes(tipId)) {
+                                likedTips.push(tipId);
+                                localStorage.setItem('xfitLikedTips', JSON.stringify(likedTips));
+                            }
+                            
+                            showToast("Tip added to your likes");
+                        } else {
+                            // Unlike tip
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            icon.style.color = '';
+                            
+                            // Update like count
+                            const newCount = parseInt(count.textContent) - 1;
+                            count.textContent = newCount;
+                            
+                            // Save new count to localStorage
+                            likeCounts[tipId] = newCount;
+                            localStorage.setItem('xfitLikeCounts', JSON.stringify(likeCounts));
+                            
+                            // Remove from liked tips
+                            const updatedLikes = likedTips.filter(id => id !== tipId);
+                            localStorage.setItem('xfitLikedTips', JSON.stringify(updatedLikes));
+                            
+                            showToast("Tip removed from your likes");
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.save-action').forEach(action => {
+                    action.addEventListener('click', function() {
+                        const icon = this.querySelector('i');
+                        const tipCard = this.closest('.tip-card');
+                        const tipId = tipCard.getAttribute('data-id');
+                        const tipTitle = tipCard.querySelector('.tip-title').textContent;
+                        const tipContent = tipCard.querySelector('.tip-content').textContent;
+                        const tipCategory = tipCard.querySelector('.tip-category').textContent.toLowerCase();
+                        
+                        // Get saved tips from localStorage or create empty array
+                        const savedTips = JSON.parse(localStorage.getItem('xfitSavedTips')) || [];
+                        
+                        // Map tip categories to note categories
+                        let noteCategory = 'other';
+                        if (tipCategory.includes('nutrition')) {
+                            noteCategory = 'nutrition';
+                        } else if (tipCategory.includes('workout')) {
+                            noteCategory = 'workout';
+                        } else if (tipCategory.includes('goal') || tipCategory.includes('motivation')) {
+                            noteCategory = 'goals';
+                        }
+                        
+                        if (icon.classList.contains('far')) {
+                            // Save to notes
+                            saveTipToNotes(tipTitle, tipContent, noteCategory);
+                            
+                            // Add to saved tips if not already there
+                            if (!savedTips.includes(tipId)) {
+                                savedTips.push(tipId);
+                                localStorage.setItem('xfitSavedTips', JSON.stringify(savedTips));
+                            }
+                            
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            icon.style.color = '#feca57';
+                            showToast("Tip saved to your notes");
+                        } else {
+                            // Check if we should remove from notes
+                            // Here we keep the note but just update the visual state
+                            // You could add code to actually remove the note if desired
+                            
+                            // Remove from saved tips
+                            const updatedSaved = savedTips.filter(id => id !== tipId);
+                            localStorage.setItem('xfitSavedTips', JSON.stringify(updatedSaved));
+                            
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            icon.style.color = '';
+                            showToast("Tip removed from your collection");
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.share-action').forEach(action => {
+                    action.addEventListener('click', function() {
+                        showToast("Tip link copied to clipboard!");
+                    });
+                });
+            }
+            
+            // Helper function to determine category based on content
+            function determineCategory(query, response) {
+                query = query.toLowerCase();
+                response = response.toLowerCase();
+                
+                if (query.includes('beginner') || query.includes('start') || query.includes('new to') || 
+                    response.includes('beginner') || response.includes('starting out')) {
+                    return 'beginner';
+                } else if (query.includes('food') || query.includes('eat') || query.includes('diet') || 
+                          query.includes('nutrition') || query.includes('meal') || query.includes('calorie') ||
+                          response.includes('eat') || response.includes('food') || response.includes('diet') ||
+                          response.includes('nutrition') || response.includes('meal')) {
+                    return 'nutrition';
+                } else if (query.includes('recover') || query.includes('rest') || query.includes('sleep') ||
+                          query.includes('injury') || response.includes('recover') || response.includes('rest') ||
+                          response.includes('sleep')) {
+                    return 'recovery';
+                } else if (query.includes('motivat') || query.includes('habit') || query.includes('consistent') ||
+                          query.includes('routine') || response.includes('motivat') || response.includes('habit') ||
+                          response.includes('consistent')) {
+                    return 'motivation';
+                } else {
+                    return 'workout';
+                }
+            }
+            
+            // Helper function to format content text with paragraphs
+            function formatContent(content) {
+                // Remove any asterisks that might be in the response
+                content = content.replace(/\*/g, '');
+                
+                // Split by line breaks and filter out empty lines
+                const paragraphs = content.split('\n').filter(p => p.trim() !== '');
+                
+                // Join paragraphs with proper HTML
+                return paragraphs.map(p => `<p>${p}</p>`).join('');
+            }
+            
+            // Helper function to capitalize first letter
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+            
+            // Show toast notification
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Handle swipe navigation
+            let touchStartX = 0;
+            let touchEndX = 0;
+            let isCategoryChipInteraction = false;
+            
+            // Check if touch started in category chips area
+            document.querySelector('.category-chips').addEventListener('touchstart', function(e) {
+                isCategoryChipInteraction = true;
+            }, false);
+            
+            document.querySelector('.category-chips').addEventListener('touchend', function(e) {
+                // Reset after a short delay to allow scrolling
+                setTimeout(() => {
+                    isCategoryChipInteraction = false;
+                }, 300);
+            }, false);
+            
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            document.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                // Don't handle swipe navigation if user is interacting with category chips
+                if (isCategoryChipInteraction) {
+                    return;
+                }
+                
+                if (touchEndX < touchStartX - 100) {
+                    // Swiped left - navigate to notes
+                    window.location.href = 'notes.html';
+                }
+                
+                if (touchEndX > touchStartX + 100) {
+                    // Swiped right - navigate to explore
+                    window.location.href = 'explore.html';
+                }
+            }
+
+            // Function to save tip to notes
+            function saveTipToNotes(title, content, category) {
+                // Get existing notes or create empty array
+                const notes = JSON.parse(localStorage.getItem('xfitNotes')) || [];
+                
+                // Create new note object
+                const newNote = {
+                    id: Date.now().toString(),
+                    title: title,
+                    content: content,
+                    category: category,
+                    completed: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Add new note to beginning of array
+                notes.unshift(newNote);
+                
+                // Save back to localStorage
+                localStorage.setItem('xfitNotes', JSON.stringify(notes));
+            }
+
+            // Function to initialize sample tip counts in localStorage
+            function initializeSampleTipCounts() {
+                const likeCounts = JSON.parse(localStorage.getItem('xfitLikeCounts')) || {};
+                let modified = false;
+                
+                sampleTips.forEach(tip => {
+                    if (likeCounts[tip.id] === undefined) {
+                        likeCounts[tip.id] = tip.likes;
+                        modified = true;
+                    }
+                });
+                
+                if (modified) {
+                    localStorage.setItem('xfitLikeCounts', JSON.stringify(likeCounts));
+                }
+            }
+        });
+
+        // Register service worker if not already registered
+        if ('serviceWorker' in navigator && !navigator.serviceWorker.controller) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html> 

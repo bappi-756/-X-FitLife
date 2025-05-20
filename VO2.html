@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VO2 Max Calculator - XfitLife</title>
+    <link rel="icon" href="icons/x-fit.ico">
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#6c40c0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="X-fitLife">
+        <link rel="apple-touch-icon" href="icons/x-fit.png">
+        <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .vo2-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+        }
+        
+        .VO2-CON {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            background-color: var(--background-color);
+            margin-bottom: 70px; /* Space for bottom nav */
+        }
+        
+        .vo2-card {
+            background-color: var(--card-background);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .vo2-form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .vo2-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .vo2-form-group input, .vo2-form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+        
+        .vo2-form-group input:focus, .vo2-form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .vo2-gender-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+        }
+        
+        .vo2-gender-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .vo2-gender-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(108, 64, 192, 0.1);
+        }
+        
+        .vo2-gender-option i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .calculate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 600;
+            margin: 1rem 0;
+            box-shadow: 0 2px 8px rgba(108, 64, 192, 0.3);
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #5a35a0;
+        }
+        
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .vo2-result {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .vo2-result-content {
+            background-color: var(--card-background);
+            padding: 2rem;
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            min-width: 100vw;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: popIn 0.5s ease;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .close-result {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--background-color);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .vo2-result.visible {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .vo2-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .fitness-level-section {
+            background-color: var(--background-color);
+            border-radius: 15px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .fitness-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .fitness-level {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .level-poor {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        
+        .level-fair {
+            background-color: #feca57;
+            color: black;
+        }
+        
+        .level-good {
+            background-color: #1dd1a1;
+            color: white;
+        }
+        
+        .level-excellent {
+            background-color: #54a0ff;
+            color: white;
+        }
+        
+        .level-superior {
+            background-color: #5f27cd;
+            color: white;
+        }
+        
+        .vo2-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            text-align: left;
+            max-width: 450px;
+        }
+        
+        .vo2-formula {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+            margin-top: 1rem;
+            text-align: left;
+            padding: 0.8rem;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            max-width: 450px;
+        }
+        
+        .test-method-container {
+            margin-bottom: 1.2rem;
+        }
+        
+        .test-option {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .test-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(108, 64, 192, 0.1);
+        }
+        
+        .test-radio {
+            margin-right: 0.8rem;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            outline: none;
+            position: relative;
+        }
+        
+        .test-radio:checked {
+            border-color: var(--primary-color);
+        }
+        
+        .test-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+        }
+        
+        .test-label {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .test-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: var(--text-color);
+        }
+        
+        .test-description {
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
+        
+        .units-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            padding: 0.3rem;
+            border: 1px solid var(--border-color);
+            max-width: 250px;
+        }
+        
+        .unit-option {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+        
+        .unit-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        @media (max-width: 480px) {
+            .vo2-card {
+                padding: 1.2rem;
+            }
+            
+            .vo2-value {
+                font-size: 2rem;
+            }
+            
+            .vo2-gender-option i {
+                font-size: 1.5rem;
+            }
+            
+            .vo2-result-content {
+                padding: 1.5rem;
+            }
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .progress-bar {
+            height: 24px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #ff6b6b, #feca57, #1dd1a1, #54a0ff, #5f27cd);
+            position: relative;
+        }
+        
+        .progress-marker {
+            position: absolute;
+            top: -25px;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background-color: var(--text-color);
+        }
+        
+        .progress-marker::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -4px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--text-color);
+            border-radius: 50%;
+        }
+        
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: var(--secondary-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header style="z-index: 1000;">
+            <div class="header-left">
+                <a class="back-button" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left" style="font-size: 1.5rem;"></i>
+                </a>
+                <h1 style="margin-left: 10px;">VO2 Max</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="userProfileIcon" onclick="window.location.href='settings.html'">
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="VO2-CON">
+            <div class="vo2-container">
+                <div class="units-toggle">
+                    <div class="unit-option active" id="metricUnit">Metric</div>
+                    <div class="unit-option" id="imperialUnit">Imperial</div>
+                </div>
+                
+                <div class="vo2-card">
+                    <div class="vo2-gender-container">
+                        <div class="vo2-gender-option selected" data-gender="male">
+                            <i class="fas fa-male"></i>
+                            <span>Male</span>
+                        </div>
+                        <div class="vo2-gender-option" data-gender="female">
+                            <i class="fas fa-female"></i>
+                            <span>Female</span>
+                        </div>
+                    </div>
+                    
+                    <div class="vo2-form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" placeholder="Years" min="15" max="80">
+                        <div class="error-message" id="ageError">Please enter a valid age (15-80)</div>
+                    </div>
+                    
+                    <div class="test-method-container">
+                        <label>Choose Test Method</label>
+                        
+                        <div class="test-option selected" data-test="resting">
+                            <input type="radio" name="test" class="test-radio" checked>
+                            <div class="test-label">
+                                <span class="test-name">Resting Heart Rate Method</span>
+                                <span class="test-description">Easiest method - only requires your resting heart rate</span>
+                            </div>
+                        </div>
+                        
+                        <div class="test-option" data-test="walk">
+                            <input type="radio" name="test" class="test-radio">
+                            <div class="test-label">
+                                <span class="test-name">1-Mile Walk Test</span>
+                                <span class="test-description">Walk 1 mile as fast as possible and record your time and heart rate</span>
+                            </div>
+                        </div>
+                        
+                        <div class="test-option" data-test="run">
+                            <input type="radio" name="test" class="test-radio">
+                            <div class="test-label">
+                                <span class="test-name">1.5-Mile Run Test</span>
+                                <span class="test-description">Run 1.5 miles as fast as possible and record your time</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Resting HR Method Inputs -->
+                    <div id="restingMethod">
+                        <div class="vo2-form-group">
+                            <label for="restingHR">Resting Heart Rate</label>
+                            <input type="number" id="restingHR" placeholder="Beats per minute" min="40" max="120">
+                            <div class="error-message" id="restingHRError">Please enter a valid resting heart rate (40-120)</div>
+                        </div>
+                        
+                        <div class="vo2-form-group">
+                            <label for="maxHR">Maximum Heart Rate (Optional)</label>
+                            <input type="number" id="maxHR" placeholder="Beats per minute (leave blank to estimate)">
+                            <div class="error-message" id="maxHRError">Please enter a valid max heart rate</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 1-Mile Walk Test Inputs -->
+                    <div id="walkMethod" style="display: none;">
+                        <div id="metricInputsWalk">
+                            <div class="vo2-form-group">
+                                <label for="weight">Weight</label>
+                                <input type="number" id="weight" placeholder="Kilograms" step="0.1" min="30" max="200">
+                                <div class="error-message" id="weightError">Please enter a valid weight</div>
+                            </div>
+                        </div>
+                        
+                        <div id="imperialInputsWalk" style="display: none;">
+                            <div class="vo2-form-group">
+                                <label for="weightLbs">Weight</label>
+                                <input type="number" id="weightLbs" placeholder="Pounds" step="0.1" min="66" max="440">
+                                <div class="error-message" id="weightLbsError">Please enter a valid weight</div>
+                            </div>
+                        </div>
+                        
+                        <div class="vo2-form-group">
+                            <label for="walkTime">Time to walk 1 mile</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="walkMinutes" placeholder="Minutes" min="10" max="30" style="width: 50%;">
+                                <input type="number" id="walkSeconds" placeholder="Seconds" min="0" max="59" style="width: 50%;">
+                            </div>
+                            <div class="error-message" id="walkTimeError">Please enter a valid time</div>
+                        </div>
+                        
+                        <div class="vo2-form-group">
+                            <label for="walkHR">Heart Rate after walk (per 15 sec)</label>
+                            <input type="number" id="walkHR" placeholder="Beats in 15 seconds" min="15" max="60">
+                            <div class="error-message" id="walkHRError">Please enter a valid heart rate</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 1.5-Mile Run Test Inputs -->
+                    <div id="runMethod" style="display: none;">
+                        <div class="vo2-form-group">
+                            <label for="runTime">Time to run 1.5 miles</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="runMinutes" placeholder="Minutes" min="5" max="30" style="width: 50%;">
+                                <input type="number" id="runSeconds" placeholder="Seconds" min="0" max="59" style="width: 50%;">
+                            </div>
+                            <div class="error-message" id="runTimeError">Please enter a valid time</div>
+                        </div>
+                    </div>
+                    
+                    <button class="calculate-btn" id="calculateBtn">Calculate VO2 Max</button>
+                </div>
+                
+                <div class="vo2-card">
+                    <h3>What is VO2 Max?</h3>
+                    <p>VO2 Max is the maximum amount of oxygen your body can utilize during intense exercise. It's measured in milliliters of oxygen used per kilogram of body weight per minute (ml/kg/min).</p>
+                    <p>A higher VO2 Max indicates better cardiovascular fitness and endurance. It's considered one of the best indicators of aerobic fitness and can predict performance in endurance activities.</p>
+                    <h4>How is it measured?</h4>
+                    <p>The gold standard for measuring VO2 Max involves laboratory testing with specialized equipment that analyzes your breathing while you exercise at increasing intensity. However, the calculator methods on this page provide reliable estimates based on research-validated formulas.</p>
+                    <h4>How to improve your VO2 Max:</h4>
+                    <ul style="text-align: left; padding-left: 20px;">
+                        <li>High-intensity interval training (HIIT)</li>
+                        <li>Regular endurance training</li>
+                        <li>Consistent cardio workouts</li>
+                        <li>Gradually increasing exercise intensity</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+        
+        <!-- VO2 Max Result Popup -->
+        <div class="vo2-result popup" id="vo2Result">
+            <div class="vo2-result-content">
+                <button class="close-result" id="closeResult">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <h3>Your VO2 Max</h3>
+                <div class="vo2-value" id="vo2Value">42.5</div>
+                <p>ml/kg/min</p>
+                
+                <div class="fitness-level-section">
+                    <div class="fitness-title">Your Fitness Level</div>
+                    <div class="fitness-level" id="fitnessLevel">Good</div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-marker" id="userMarker" style="left: 50%;"></div>
+                        </div>
+                        <div class="progress-labels">
+                            <span>Poor</span>
+                            <span>Fair</span>
+                            <span>Good</span>
+                            <span>Excellent</span>
+                            <span>Superior</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="vo2-description">
+                    <p>VO2 Max is a strong indicator of your cardiovascular fitness and endurance capacity. It shows how efficiently your body can use oxygen during intense exercise.</p>
+                    <p>Your result is compared to normative data for your age and gender to determine your fitness level.</p>
+                </div>
+                
+                <div class="vo2-formula" id="vo2Formula">
+                    Formula used: VO2 Max = 15 × (HRmax ÷ HRrest)
+                </div>
+            </div>
+        </div>
+        
+        <nav class="bottom-nav" style="z-index: 100;">
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <div class="nav-item">
+                <i class="fas fa-search"></i>
+                <span>Explore</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>Ask</span>
+            </div>
+            <a href="notes.html" class="nav-item">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Notes</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load user profile image if available
+            const userProfileIcon = document.getElementById('userProfileIcon');
+            const profileCircle = userProfileIcon.querySelector('.profile-circle');
+            
+            // Get user data from localStorage
+            const userData = JSON.parse(localStorage.getItem('xfitUser'));
+            if (userData && userData.profileImage) {
+                profileCircle.innerHTML = `<img src="${userData.profileImage}" alt="${userData.username}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            }
+            
+            // Elements
+            const metricUnitBtn = document.getElementById('metricUnit');
+            const imperialUnitBtn = document.getElementById('imperialUnit');
+            const metricInputsWalk = document.getElementById('metricInputsWalk');
+            const imperialInputsWalk = document.getElementById('imperialInputsWalk');
+            const genderOptions = document.querySelectorAll('.vo2-gender-option');
+            const testOptions = document.querySelectorAll('.test-option');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const vo2Result = document.getElementById('vo2Result');
+            const vo2Value = document.getElementById('vo2Value');
+            const fitnessLevel = document.getElementById('fitnessLevel');
+            const userMarker = document.getElementById('userMarker');
+            const vo2Formula = document.getElementById('vo2Formula');
+            const closeResult = document.getElementById('closeResult');
+            
+            // Method containers
+            const restingMethod = document.getElementById('restingMethod');
+            const walkMethod = document.getElementById('walkMethod');
+            const runMethod = document.getElementById('runMethod');
+            
+            // Input fields
+            const ageInput = document.getElementById('age');
+            const restingHRInput = document.getElementById('restingHR');
+            const maxHRInput = document.getElementById('maxHR');
+            const weightInput = document.getElementById('weight');
+            const weightLbsInput = document.getElementById('weightLbs');
+            const walkMinutesInput = document.getElementById('walkMinutes');
+            const walkSecondsInput = document.getElementById('walkSeconds');
+            const walkHRInput = document.getElementById('walkHR');
+            const runMinutesInput = document.getElementById('runMinutes');
+            const runSecondsInput = document.getElementById('runSeconds');
+            
+            // Error message elements
+            const ageError = document.getElementById('ageError');
+            const restingHRError = document.getElementById('restingHRError');
+            const maxHRError = document.getElementById('maxHRError');
+            const weightError = document.getElementById('weightError');
+            const weightLbsError = document.getElementById('weightLbsError');
+            const walkTimeError = document.getElementById('walkTimeError');
+            const walkHRError = document.getElementById('walkHRError');
+            const runTimeError = document.getElementById('runTimeError');
+            
+            // Variables
+            let currentUnit = 'metric';
+            let selectedGender = 'male';
+            let selectedTest = 'resting';
+            
+            // Toggle between metric and imperial units
+            metricUnitBtn.addEventListener('click', function() {
+                currentUnit = 'metric';
+                metricUnitBtn.classList.add('active');
+                imperialUnitBtn.classList.remove('active');
+                metricInputsWalk.style.display = 'block';
+                imperialInputsWalk.style.display = 'none';
+                resetForm();
+            });
+            
+            imperialUnitBtn.addEventListener('click', function() {
+                currentUnit = 'imperial';
+                imperialUnitBtn.classList.add('active');
+                metricUnitBtn.classList.remove('active');
+                imperialInputsWalk.style.display = 'block';
+                metricInputsWalk.style.display = 'none';
+                resetForm();
+            });
+            
+            // Select gender
+            genderOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    genderOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedGender = this.getAttribute('data-gender');
+                });
+            });
+            
+            // Select test method
+            testOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    testOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Set the radio button checked
+                    this.querySelector('.test-radio').checked = true;
+                    
+                    // Update selected test method
+                    selectedTest = this.getAttribute('data-test');
+                    
+                    // Show/hide appropriate input fields
+                    restingMethod.style.display = 'none';
+                    walkMethod.style.display = 'none';
+                    runMethod.style.display = 'none';
+                    
+                    if (selectedTest === 'resting') {
+                        restingMethod.style.display = 'block';
+                    } else if (selectedTest === 'walk') {
+                        walkMethod.style.display = 'block';
+                    } else if (selectedTest === 'run') {
+                        runMethod.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Validate input fields
+            function validateInputs() {
+                let isValid = true;
+                
+                // Reset error messages
+                ageError.style.display = 'none';
+                restingHRError.style.display = 'none';
+                maxHRError.style.display = 'none';
+                weightError.style.display = 'none';
+                weightLbsError.style.display = 'none';
+                walkTimeError.style.display = 'none';
+                walkHRError.style.display = 'none';
+                runTimeError.style.display = 'none';
+                
+                // Validate age
+                const age = parseInt(ageInput.value);
+                if (isNaN(age) || age < 15 || age > 80) {
+                    ageError.style.display = 'block';
+                    isValid = false;
+                }
+                
+                // Validate based on selected test method
+                if (selectedTest === 'resting') {
+                    // Validate resting heart rate
+                    const restingHR = parseInt(restingHRInput.value);
+                    if (isNaN(restingHR) || restingHR < 40 || restingHR > 120) {
+                        restingHRError.style.display = 'block';
+                        isValid = false;
+                    }
+                    
+                    // Validate max heart rate if provided
+                    if (maxHRInput.value) {
+                        const maxHR = parseInt(maxHRInput.value);
+                        if (isNaN(maxHR) || maxHR < 100 || maxHR > 220) {
+                            maxHRError.style.display = 'block';
+                            isValid = false;
+                        }
+                    }
+                } 
+                else if (selectedTest === 'walk') {
+                    // Validate weight based on unit
+                    if (currentUnit === 'metric') {
+                        const weight = parseFloat(weightInput.value);
+                        if (isNaN(weight) || weight < 30 || weight > 200) {
+                            weightError.style.display = 'block';
+                            isValid = false;
+                        }
+                    } else {
+                        const weightLbs = parseFloat(weightLbsInput.value);
+                        if (isNaN(weightLbs) || weightLbs < 66 || weightLbs > 440) {
+                            weightLbsError.style.display = 'block';
+                            isValid = false;
+                        }
+                    }
+                    
+                    // Validate walk time
+                    const walkMinutes = parseInt(walkMinutesInput.value);
+                    const walkSeconds = parseInt(walkSecondsInput.value) || 0;
+                    
+                    if (isNaN(walkMinutes) || walkMinutes < 10 || walkMinutes > 30 || 
+                        isNaN(walkSeconds) || walkSeconds < 0 || walkSeconds > 59) {
+                        walkTimeError.style.display = 'block';
+                        isValid = false;
+                    }
+                    
+                    // Validate heart rate after walk
+                    const walkHR = parseInt(walkHRInput.value);
+                    if (isNaN(walkHR) || walkHR < 15 || walkHR > 60) {
+                        walkHRError.style.display = 'block';
+                        isValid = false;
+                    }
+                } 
+                else if (selectedTest === 'run') {
+                    // Validate run time
+                    const runMinutes = parseInt(runMinutesInput.value);
+                    const runSeconds = parseInt(runSecondsInput.value) || 0;
+                    
+                    if (isNaN(runMinutes) || runMinutes < 5 || runMinutes > 30 || 
+                        isNaN(runSeconds) || runSeconds < 0 || runSeconds > 59) {
+                        runTimeError.style.display = 'block';
+                        isValid = false;
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            // Calculate VO2 max based on selected method
+            function calculateVO2Max() {
+                const age = parseInt(ageInput.value);
+                let vo2max = 0;
+                
+                if (selectedTest === 'resting') {
+                    // Resting Heart Rate Method (Uth–Sørensen–Overgaard–Pedersen estimation)
+                    const restingHR = parseInt(restingHRInput.value);
+                    let maxHR;
+                    
+                    if (maxHRInput.value) {
+                        maxHR = parseInt(maxHRInput.value);
+                    } else {
+                        // Estimate max HR using Tanaka formula: 208 - (0.7 * age)
+                        maxHR = 208 - (0.7 * age);
+                    }
+                    
+                    vo2max = 15 * (maxHR / restingHR);
+                    vo2Formula.innerHTML = `Formula used: VO2 Max = 15 × (${maxHR.toFixed(0)} ÷ ${restingHR}) = ${vo2max.toFixed(1)} ml/kg/min<br>
+                                         (Uth–Sørensen–Overgaard–Pedersen estimation)`;
+                } 
+                else if (selectedTest === 'walk') {
+                    // Rockport One-Mile Walk Test
+                    const walkMinutes = parseInt(walkMinutesInput.value);
+                    const walkSeconds = parseInt(walkSecondsInput.value) || 0;
+                    const walkTime = walkMinutes + (walkSeconds / 60); // in minutes
+                    const walkHR = parseInt(walkHRInput.value) * 4; // convert to beats per minute
+                    
+                    let weight;
+                    if (currentUnit === 'metric') {
+                        weight = parseFloat(weightInput.value) * 2.20462; // convert kg to lbs
+                    } else {
+                        weight = parseFloat(weightLbsInput.value);
+                    }
+                    
+                    // Rockport Formula
+                    const genderValue = selectedGender === 'male' ? 1 : 0;
+                    
+                    vo2max = 132.853 - (0.0769 * weight) - (0.3877 * age) + (6.315 * genderValue) - (3.2649 * walkTime) - (0.1565 * walkHR);
+                    
+                    vo2Formula.innerHTML = `Formula used: VO2 Max = 132.853 - (0.0769 × ${weight.toFixed(1)}) - (0.3877 × ${age}) + (${genderValue === 1 ? '6.315' : '0'}) - (3.2649 × ${walkTime.toFixed(2)}) - (0.1565 × ${walkHR}) = ${vo2max.toFixed(1)} ml/kg/min<br>
+                                         (Rockport One-Mile Walk Test)`;
+                } 
+                else if (selectedTest === 'run') {
+                    // 1.5-Mile Run Test
+                    const runMinutes = parseInt(runMinutesInput.value);
+                    const runSeconds = parseInt(runSecondsInput.value) || 0;
+                    const runTime = runMinutes + (runSeconds / 60); // in minutes
+                    
+                    // VO2 max formula for 1.5-mile run
+                    vo2max = 483 / runTime - 3.5;
+                    
+                    vo2Formula.innerHTML = `Formula used: VO2 Max = 483 ÷ ${runTime.toFixed(2)} - 3.5 = ${vo2max.toFixed(1)} ml/kg/min<br>
+                                         (1.5-Mile Run Test)`;
+                }
+                
+                return vo2max;
+            }
+            
+            // Determine fitness level based on VO2 max, age, and gender
+            function determineFitnessLevel(vo2max, age, gender) {
+                let level = '';
+                let levelClass = '';
+                let percentPosition = 0;
+                
+                // Define thresholds based on age and gender
+                let thresholds;
+                
+                if (gender === 'male') {
+                    if (age < 30) {
+                        if (vo2max < 42) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 45) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 50) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 55) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    } 
+                    else if (age < 40) {
+                        if (vo2max < 41) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 43) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 47) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 53) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                    else if (age < 50) {
+                        if (vo2max < 38) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 41) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 45) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 52) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                    else if (age < 60) {
+                        if (vo2max < 35) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 38) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 42) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 49) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                    else {
+                        if (vo2max < 31) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 35) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 38) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 45) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                } 
+                else { // female
+                    if (age < 30) {
+                        if (vo2max < 36) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 40) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 43) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 49) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    } 
+                    else if (age < 40) {
+                        if (vo2max < 34) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 37) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 40) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 45) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                    else if (age < 50) {
+                        if (vo2max < 32) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 35) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 38) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 44) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                    else if (age < 60) {
+                        if (vo2max < 25) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 29) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 30) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 34) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                    else {
+                        if (vo2max < 26) { level = 'Poor'; levelClass = 'level-poor'; percentPosition = 10; }
+                        else if (vo2max < 29) { level = 'Fair'; levelClass = 'level-fair'; percentPosition = 30; }
+                        else if (vo2max < 31) { level = 'Good'; levelClass = 'level-good'; percentPosition = 50; }
+                        else if (vo2max < 35) { level = 'Excellent'; levelClass = 'level-excellent'; percentPosition = 70; }
+                        else { level = 'Superior'; levelClass = 'level-superior'; percentPosition = 90; }
+                    }
+                }
+                
+                return { level, levelClass, percentPosition };
+            }
+            
+            // Format number with commas for thousands
+            function formatNumber(num) {
+                return num.toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            
+            // Display VO2 max result
+            function displayVO2MaxResult(vo2max) {
+                const age = parseInt(ageInput.value);
+                const { level, levelClass, percentPosition } = determineFitnessLevel(vo2max, age, selectedGender);
+                
+                // Update result display
+                vo2Value.textContent = formatNumber(vo2max);
+                fitnessLevel.textContent = level;
+                fitnessLevel.className = 'fitness-level ' + levelClass;
+                userMarker.style.left = percentPosition + '%';
+                
+                // Show result with animation
+                setTimeout(() => {
+                    vo2Result.classList.add('visible');
+                }, 10);
+            }
+            
+            // Reset form and hide result
+            function resetForm() {
+                vo2Result.classList.remove('visible');
+                
+                // Reset error messages
+                ageError.style.display = 'none';
+                restingHRError.style.display = 'none';
+                maxHRError.style.display = 'none';
+                weightError.style.display = 'none';
+                weightLbsError.style.display = 'none';
+                walkTimeError.style.display = 'none';
+                walkHRError.style.display = 'none';
+                runTimeError.style.display = 'none';
+            }
+            
+            // Calculate button click event
+            calculateBtn.addEventListener('click', function() {
+                if (validateInputs()) {
+                    const vo2max = calculateVO2Max();
+                    displayVO2MaxResult(vo2max);
+                    
+                    // Save to local storage if user is logged in
+                    if (userData) {
+                        // Store VO2 max calculation
+                        if (!userData.vo2MaxHistory) {
+                            userData.vo2MaxHistory = [];
+                        }
+                        
+                        userData.vo2MaxHistory.push({
+                            date: new Date().toISOString(),
+                            vo2max: Math.round(vo2max * 10) / 10, // Round to 1 decimal place
+                            method: selectedTest,
+                            gender: selectedGender
+                        });
+                        
+                        // Limit history to last 10 entries
+                        if (userData.vo2MaxHistory.length > 10) {
+                            userData.vo2MaxHistory = userData.vo2MaxHistory.slice(-10);
+                        }
+                        
+                        localStorage.setItem('xfitUser', JSON.stringify(userData));
+                    }
+                }
+            });
+            
+            // Close result popup
+            closeResult.addEventListener('click', function() {
+                vo2Result.classList.remove('visible');
+            });
+            
+            // Close popup when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target === vo2Result) {
+                    vo2Result.classList.remove('visible');
+                }
+            });
+            
+            // Pre-fill data if available
+            if (userData) {
+                // Set gender if available
+                if (userData.gender) {
+                    selectedGender = userData.gender;
+                    genderOptions.forEach(option => {
+                        if (option.getAttribute('data-gender') === selectedGender) {
+                            option.classList.add('selected');
+                        } else {
+                            option.classList.remove('selected');
+                        }
+                    });
+                }
+                
+                // Set age if available
+                if (userData.age) {
+                    ageInput.value = userData.age;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
